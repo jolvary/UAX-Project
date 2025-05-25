@@ -5,7 +5,7 @@ $valor = getenv('DB_USER');
 if ($valor === false) {
     echo "Variable de entorno no definida.";
 } else {
-    conectar()
+    conectar();
 }
 
 $username = getenv('DB_USER');
