@@ -64,10 +64,10 @@ function displayAsignaturas() {
 	        echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='$fila[1]' size='40'></TD>";
 	        echo "    <TD><INPUT TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='9'></TD>";
 	        echo "    <TD><INPUT TYPE='text' name='profesor[$cont]' value='$fila[3]' size='40'></TD>";
-	        echo "    <TD><a href='index.php?operacion=eliminar&asignatura=$fila[0]'><img src='iconos/remove32.png'></a></TD>";
-            echo "    <TD><a href='unidades.php?asignatura=$fila[0]'><img src='iconos/tarta.png'></a></TD>";
-            echo "    <TD><a href='instrumentos.php?asignatura=$fila[0]'><img src='iconos/smile.png'></a></TD>";
-            echo "    <TD><a href='expediente.php'><img src='iconos/birrete.png'></a></TD>";
+	        echo "    <TD><a href='index.php?operacion=eliminar&asignatura=$fila[0]'><img src='./iconos/remove32.png'></a></TD>";
+            echo "    <TD><a href='unidades.php?asignatura=$fila[0]'><img src='./iconos/tarta.png'></a></TD>";
+            echo "    <TD><a href='instrumentos.php?asignatura=$fila[0]'><img src='./iconos/smile.png'></a></TD>";
+            echo "    <TD><a href='expediente.php'><img src='./iconos/birrete.png'></a></TD>";
             echo "</TR>";
             
             $cont++;
