@@ -4,8 +4,8 @@
     
     include('funciones.php');
     
-    //DBCreation();
-    conectar();
+    DBCreation();
+    //conectar();
 
     //error_reporting(E_ALL ^ E_NOTICE);
 
