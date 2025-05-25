@@ -32,6 +32,10 @@ function DBCreation(){
 
 function conectar() {
 
+    $username = getenv('DB_USER');
+    $password = getenv('DB_PASS');
+    $instanceHost = getenv('INSTANCE_HOST');
+
     $conn = mysqli_connect($instanceHost, $password, $username, "Notas");
 
     return $conn;
