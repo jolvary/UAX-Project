@@ -31,7 +31,7 @@ function DBCreation(){
 
 function conectar() {
 
-    $conn = mysqli_connect($instanceHost, $username, $password, "NOTAS");
+    $conn = mysqli_connect($instanceHost, $username, $password, "Notas");
 
     return $conn;
 
