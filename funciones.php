@@ -37,7 +37,7 @@ function conectar() {
     $password = getenv('DB_PASS');
     $instanceHost = getenv('INSTANCE_HOST');
 
-    $conn = mysqli_connect($instanceHost, $password, $username, "Notas");
+    $conn = mysqli_connect($instanceHost, $username, $password, "Notas");
 
     return $conn;
 
