@@ -2,12 +2,12 @@
 
     <?php
     
-    include('funciones.php');
+    include('./funciones.php');
     
     //DBCreation();
     conectar();
 
-    //error_reporting(E_ALL ^ E_NOTICE);
+    error_reporting(E_ALL ^ E_NOTICE);
 
     ?>
 
