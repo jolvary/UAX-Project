@@ -2,7 +2,7 @@
 
 function DBCreation(){
 
-    $conn = mysqli_connect ( "localhost", "administrador", "iO5TvRslT18VYcV9");
+    $conn = mysqli_connect ( "34.38.239.172", "adminsql", "admin");
 
     $sql = ("drop database if exists NOTAS");
     $conn->query($sql);
