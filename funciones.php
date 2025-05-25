@@ -20,7 +20,7 @@ function DBCreation(){
 
 function conectar() {
 
-    $conn = mysqli_connect( "localhost", "administrador", "iO5TvRslT18VYcV9", "NOTAS");
+    $conn = mysqli_connect( "34.38.239.172", "adminsql", "admin", "NOTAS");
 
     return $conn;
 
