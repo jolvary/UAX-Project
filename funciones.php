@@ -8,9 +8,9 @@ if ($valor === false) {
     echo "El valor es: " . $valor;
 }
 
-$username = os.getenv('DB_USER'); // e.g. 'your_db_user'
-$password = os.getenv('DB_PASS'); // e.g. 'your_db_password'
-$instanceHost = os.getenv('INSTANCE_HOST'); // e.g. '127.0.0.1' ('172.17.0.1' for GAE Flex)
+$username = getenv('DB_USER'); // e.g. 'your_db_user'
+$password = getenv('DB_PASS'); // e.g. 'your_db_password'
+$instanceHost = getenv('INSTANCE_HOST'); // e.g. '127.0.0.1' ('172.17.0.1' for GAE Flex)
 
 function DBCreation(){
 
