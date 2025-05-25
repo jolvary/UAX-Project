@@ -62,7 +62,7 @@ class DatabaseTcp
 
 function DBCreation(){
 
-    $conn = mysqli_connect ( getenv('INSTANCE_HOST'), getenv('DB_USER'), getenv('DB_PASS'));
+    $conn = mysqli_connect ( $instanceHost, $username, $password);
 
     $sql = ("drop database if exists NOTAS");
     $conn->query($sql);
@@ -80,7 +80,7 @@ function DBCreation(){
 
 function conectar() {
 
-    $conn = mysqli_connect(getenv('INSTANCE_HOST'), getenv('DB_USER'), getenv('DB_PASS'), "NOTAS");
+    $conn = mysqli_connect($instanceHost, $username, $password, "NOTAS");
 
     return $conn;
 
