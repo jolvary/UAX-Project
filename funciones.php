@@ -1,11 +1,14 @@
 <?php
 
-$valor = getenv('DB_USER');
+use Google\Cloud\Core\Compute\Metadata;
 
-if ($valor === false) {
+$metadata = new Metadata();
+$projectId = $metadata->getProjectId();
+
+if ($projectId === false) {
     echo "Variable de entorno no definida.";
 } else {
-    echo "Soy basura y esta es mi mierda: $valor";
+    echo "Soy basura y esta es mi mierda: $projectId";
     conectar();
 }
 
