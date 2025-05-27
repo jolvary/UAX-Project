@@ -1,21 +1,39 @@
 <?php
 
-$valor = getenv('DB_USER');
+function getCustomMetadata($key) {
+    $url = "http://metadata.google.internal/computeMetadata/v1/project/attributes/$key";
+    $headers = ['Metadata-Flavor: Google'];
 
-if ($valor === false) {
-    echo "Variable de entorno no definida.";
-} else {
-    echo "Soy basura y esta es mi mierda: $valor";
-    conectar();
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        return $response;
+    } else {
+        return null;
+    }
 }
 
-$username = getenv('DB_USER');
-$password = getenv('DB_PASS');
-$instanceHost = getenv('INSTANCE_HOST');
+function getMetadataKeys() {
+    $dbUser = getCustomMetadata('DB_USER');
+    $dbPass = getCustomMetadata('DB_PASS');
+    $instanceHost = getCustomMetadata('INSTANCE_HOST');
+
+    echo "DB_USER: " . ($dbUser ?? 'Not found') . PHP_EOL;
+    echo "DB_PASS: " . ($dbPass ?? 'Not found') . PHP_EOL;
+    echo "INSTANCE_HOST: " . ($instanceHost ?? 'Not found') . PHP_EOL;
+
+    conectar();
+
+}
 
 function DBCreation(){
 
-    $conn = mysqli_connect ( $instanceHost, $username, $password);
+    $conn = mysqli_connect ( $instanceHost, $dbUser, $dbPass);
 
     $sql = ("drop database if exists Notas");
     $conn->query($sql);
@@ -37,7 +55,7 @@ function conectar() {
     $password = getenv('DB_PASS');
     $instanceHost = getenv('INSTANCE_HOST');
 
-    $conn = mysqli_connect($instanceHost, $username, $password, "Notas");
+    $conn = mysqli_connect($instanceHost, $dbUser, $dbPass, "Notas");
 
     return $conn;
 

@@ -4,9 +4,8 @@
     
     include('./funciones.php');
     
-    //DBCreation();
-    conectar();
-
+    getMetadataKeys();
+    
     error_reporting(E_ALL ^ E_NOTICE);
 
     ?>
