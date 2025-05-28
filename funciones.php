@@ -120,8 +120,8 @@ function displayUnidades($asignatura) {
 
     global $conn;
 
-    $sql = "SELECT * FROM Notas.unidades where asignatura=$asignatura";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM Notas.unidades where asignatura='$asignatura'";
+    $result = $conn->query($sql) or die(mysqli_error($conn));;
 
 	if ($result) {
 
