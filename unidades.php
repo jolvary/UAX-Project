@@ -3,15 +3,22 @@
     <?php
     
     include('funciones.php');
+    require_once 'db.php';
+    global $conn;
     
     //DBCreation();
-    $conn = conectar();
+ 
     $asig = $_GET['asignatura'];
 
-    $sql = ("SELECT name FROM ESTUDIOS.ASIGNATURAS where code='$asig'");
-    $nombre = $conn->query($sql);
-    $code = mysqli_fetch_row($nombre);
+    $asignatura = $asig;
+    $sql = ("SELECT nombre FROM Notas.asignaturas where codigo='$asig'");
+    $result = $conn->query($sql);
+    $code = mysqli_fetch_row($result);
 	$nasignatura = $code[0];
+
+    error_reporting(E_ALL ^ E_NOTICE);
+    error_reporting(E_ALL ^ E_WARNING); 
+    
     ?>
 
 <HEAD>
@@ -32,8 +39,8 @@
 		    <?php 
                 //var_dump($_GET);
                 //var_dump($_POST);
-                procesarCambiosUnidades();
-                displayUnidades();
+                procesarCambiosUnidades($asig);
+                displayUnidades($asig);
                 
             ?>
         </TABLE><br/>

@@ -3,12 +3,12 @@
     <?php
     
     include('funciones.php');
+    require_once 'db.php';
     
     //DBCreation();
-    $conn = conectar();
     $asig = $_GET['asignatura'];
 
-    $sql = ("SELECT name FROM ESTUDIOS.ASIGNATURAS where code='$asig'");
+    $sql = ("SELECT nombre FROM Notas.asignaturas where codigo='$asig'");
     $nombre = $conn->query($sql);
     $code = mysqli_fetch_row($nombre);
 	$nasignatura = $code[0];
@@ -39,7 +39,7 @@
 		    <?php 
                 //var_dump($_GET);
                 //var_dump($_POST);
-                deleteInstrumento();
+                deleteInstrumento($asig);
                 displayInstrumentos($asig);               
             ?>
         </TABLE><br/>

@@ -2,10 +2,8 @@
 
     <?php
     
-    include('funciones.php');
-    
-    //DBCreation();
-    $conn = conectar();
+    require_once 'db.php';
+    require_once 'funciones.php';
     
     ?>
 

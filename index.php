@@ -3,9 +3,8 @@
     <?php
     
     include('./funciones.php');
-    
-    getMetadataKeys();
-    
+    require_once './db.php';
+   
     error_reporting(E_ALL ^ E_NOTICE);
 
     ?>

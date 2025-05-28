@@ -1,71 +1,11 @@
 <?php
 
-function getCustomMetadata($key) {
-    $url = "http://metadata.google.internal/computeMetadata/v1/project/attributes/$key";
-    $headers = ['Metadata-Flavor: Google'];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        return $response;
-    } else {
-        return null;
-    }
-}
-
-function getMetadataKeys() {
-    $dbUser = getCustomMetadata('DB_USER');
-    $dbPass = getCustomMetadata('DB_PASS');
-    $instanceHost = getCustomMetadata('INSTANCE_HOST');
-
-    echo "DB_USER: " . ($dbUser ?? 'Not found') . PHP_EOL;
-    echo "DB_PASS: " . ($dbPass ?? 'Not found') . PHP_EOL;
-    echo "INSTANCE_HOST: " . ($instanceHost ?? 'Not found') . PHP_EOL;
-
-    conectar();
-
-}
-
-function DBCreation(){
-
-    $conn = mysqli_connect ( $instanceHost, $dbUser, $dbPass);
-
-    $sql = ("drop database if exists Notas");
-    $conn->query($sql);
-
-    $sql = ("create database if not exists Notas");
-    $conn->query($sql);
-
-    $sql = ("use Notas");
-    $conn->query($sql);
-
-    $sql = file_get_contents('notas.sql');
-    $conn->multi_query($sql);
-
-}
-
-function conectar() {
-
-    $username = getenv('DB_USER');
-    $password = getenv('DB_PASS');
-    $instanceHost = getenv('INSTANCE_HOST');
-
-    $conn = mysqli_connect($instanceHost, $dbUser, $dbPass, "Notas");
-
-    return $conn;
-
-}
-
 // Asignaturas
+require_once __DIR__ . '/db.php';
 
 function displayAsignaturas() {
 
-    $conn = conectar();
+    global $conn;
 
     $sql = "SELECT * FROM Notas.asignaturas";
     $result = $conn->query($sql);
@@ -107,7 +47,7 @@ function displayAsignaturas() {
 
 function procesarCambiosAsignatura() {
 
-    $conn = conectar();
+    global $conn;
 
     if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
 
@@ -167,7 +107,8 @@ function procesarCambiosAsignatura() {
 
 function updateAsignaturas ($ucodigo, $unewCodigo, $unombre, $uhoras, $uprofesor) {
 
-    $conn = conectar();
+    global $conn;
+
 	$sql = "UPDATE Notas.asignaturas SET codigo='$unewCodigo', nombre='$unombre', horas_semana='$uhoras', profesor='$uprofesor' WHERE codigo='$ucodigo'";
 	$conn->query( $sql );
 
@@ -175,11 +116,9 @@ function updateAsignaturas ($ucodigo, $unewCodigo, $unombre, $uhoras, $uprofesor
 
 // Unidades
 
-function displayUnidades() {
+function displayUnidades($asignatura) {
 
-    $conn = conectar();
-    
-    $asignatura = $_GET['asignatura'];    
+    global $conn;
 
     $sql = "SELECT * FROM Notas.unidades where asignatura=$asignatura";
     $result = $conn->query($sql);
@@ -214,10 +153,9 @@ function displayUnidades() {
 
 }
 
-function procesarCambiosUnidades() {
+function procesarCambiosUnidades($asignatura) {
 
-    $conn = conectar();
-    $asignatura = $_GET['asignatura'];
+    global $conn;
 
     if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
 
@@ -253,12 +191,13 @@ function procesarCambiosUnidades() {
         }
 
     }
-    
+
 }
 
 function updateUnidades ($uclave, $unumero, $unombre, $uporcentaje) {
 
-    $conn = conectar();
+    global $conn;
+
 	$sql = "UPDATE Notas.unidades SET clave='$uclave', nombre='$unombre', numero='$unumero', porcentaje='$uporcentaje' WHERE clave='$uclave'";
 	$conn->query( $sql );
 
@@ -268,10 +207,12 @@ function updateUnidades ($uclave, $unumero, $unombre, $uporcentaje) {
 
 
 function displayInstrumentos($codigoAsignatura) {
-    $conexion = conectar();
+
+    global $conn;
+
     $consulta = "SELECT instrumentos.*, unidades.numero FROM `instrumentos` INNER JOIN unidades on unidades.clave= unidad WHERE unidades.asignatura = '$codigoAsignatura'";
 
-    if ($result = mysqli_query($conexion, $consulta)) {
+    if ($result = mysqli_query($conn, $consulta)) {
         $cont=0;
 		foreach ($result as $fila) {
             echo "<TR>";
@@ -297,12 +238,14 @@ function displayInstrumentos($codigoAsignatura) {
 }
 
 function dropdownUnidad($codigoAsignatura, $cont, $activo) {
-    $conexion = conectar();
+
+    global $conn;
+
     $consulta = "SELECT clave, nombre FROM unidades WHERE asignatura = '$codigoAsignatura'";
 
     echo "<TD><select name='unidad[$cont]'>";
     echo "<option value=''></option>";
-    if ($result = mysqli_query($conexion, $consulta)) {
+    if ($result = mysqli_query($conn, $consulta)) {
         foreach ($result as $fila) {
             echo "<option value='".$fila['clave']."'";
             if ($fila['clave'] == $activo) {
@@ -315,11 +258,13 @@ function dropdownUnidad($codigoAsignatura, $cont, $activo) {
 }
 
 function procesarCambiosInstrumentos($datos) {
+
+    global $conn;
+
     if(!isset($datos["clave"])) {
        return;
     }
-	$conexion = conectar();
-	$claves = $datos["clave"];
+    $claves = $datos["clave"];
 	$unidades = $datos["unidad"];
 	$nombres = $datos["nombre"];
 	$pesos = $datos["peso"];
@@ -332,7 +277,7 @@ function procesarCambiosInstrumentos($datos) {
 
 function deleteInstrumento() {
 
-    $conn = conectar();
+    global $conn;
 
     if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
 
@@ -345,13 +290,17 @@ function deleteInstrumento() {
 }
 
 function updateInstrumento ($clave, $unidad, $nombre, $peso, $calificacion) {
-	$conn = conectar();
+	
+    global $conn;
+
 	$sql = "UPDATE instrumentos SET unidad='$unidad', nombre='$nombre', peso='$peso', calificacion='$calificacion' WHERE clave='$clave'";
     $conn->query($sql);
 }
 
 function newInstrumento($unidad, $nombre, $peso, $calificacion) {
-    $conn = conectar();
+
+    global $conn;
+
     if(!empty($nombre)) {
 	    $sql = "INSERT INTO instrumentos (unidad, nombre, peso, calificacion) VALUES ( '$unidad','$nombre', '$peso', '$calificacion')";
 	    $conn->query($sql);   
@@ -361,7 +310,9 @@ function newInstrumento($unidad, $nombre, $peso, $calificacion) {
 // EXPEDIENTES
 
 function displayExpediente () {
-    $conexion = conectar();
+        
+    global $conn;
+
     $consulta="select codigo, nombre,
     (select sum((u.porcentaje/100)*
                 (select sum((peso/100)*calificacion)
@@ -370,7 +321,8 @@ function displayExpediente () {
     from unidades as u
     where u.asignatura=a.codigo) as notamedia
     from asignaturas as a";
-    if ($result=mysqli_query($conexion, $consulta)) {
+
+    if ($result = $conn->query($consulta)) {
         $cont=0;
         while($fila=mysqli_fetch_row($result)){
             echo "<TR>";
