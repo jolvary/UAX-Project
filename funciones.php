@@ -120,8 +120,8 @@ function displayUnidades($asignatura) {
 
     global $conn;
 
-    $sql = "SELECT * FROM Notas.unidades where asignatura='$asignatura'";
-    $result = $conn->query($sql) or die(mysqli_error($conn));;
+    $sql = "SELECT * FROM Notas.unidades where asignatura=$asignatura";
+    $result = $conn->query($sql);
 
 	if ($result) {
 
@@ -177,7 +177,7 @@ function procesarCambiosUnidades($asignatura) {
 
     }
 
-    if(isset($_POST['procesar'])&&$_POST['procesar']=="Guardar Cambios") {
+    if(isset($_POST['procesar'])&&$_POST['procesar']=="Guardar Cambios"&&isset($_POST["clave"])) {
 
         $uclave = $_POST["clave"];
         $unumero = $_POST["numero"];
