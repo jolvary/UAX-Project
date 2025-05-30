@@ -2,8 +2,8 @@
 
     <?php
     
-    include('funciones.php');
-    require_once 'db.php';
+    require_once '../config/funciones.php';
+    require_once '../config/db.php';
     global $conn;
     
     //DBCreation();
@@ -23,16 +23,16 @@
 
 <HEAD>
 
-    <TITLE>UNIDADES</TITLE>
+    <TITLE>Unidades</TITLE>
 
 </HEAD>
 
 <BODY>
     <center>
-    <h2><a href="index.php"><div style="float: left">Volver</div></a>
+    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
     <div align="center"><?php echo 'Asignatura ', $asig, " : ", $nasignatura;?></div></h2>
 
-    <h1 style="text-align:center;"><img src='iconos/tarta.png'> UNIDADES </h1>
+    <h1 style="text-align:center;"><img src='../iconos/tarta.png'> UNIDADES </h1>
     <FORM METHOD=POST ACTION="">
         <TABLE>
 			<TR><TH>NÚM</TH><TH>NOMBRE</TH><TH>PESO (%)</TH></TR>

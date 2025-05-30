@@ -2,8 +2,8 @@
 
     <?php
     
-    include('funciones.php');
-    require_once 'db.php';
+    require_once '../config/funciones.php';
+    require_once '../config/db.php';
     
     //DBCreation();
     $asig = $_GET['asignatura'];
@@ -23,16 +23,16 @@
 
 <HEAD>
 
-    <TITLE>UNIDADES</TITLE>
+    <TITLE>Instrumentos</TITLE>
 
 </HEAD>
 
 <BODY>
     <center>
-    <h2><a href="index.php"><div style="float: left">Volver</div></a>
+    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
     <div align="center"><?php echo 'Asignatura ', $asig, " : ", $nasignatura;?></div></h2>
 
-    <h1 style="text-align:center;"><img src='iconos/smile.png'> INSTRUMENTOS </h1>
+    <h1 style="text-align:center;"><img src='../iconos/smile.png'> INSTRUMENTOS </h1>
     <FORM METHOD=POST ACTION="">
         <TABLE>
 			<TR><TH>Unidad</TH><TH>Nombre del Instrumento</TH><TH>Peso (%)</TH><TH>Calificación</TH></TR>

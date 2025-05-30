@@ -2,22 +2,22 @@
 
     <?php
     
-    require_once 'db.php';
-    require_once 'funciones.php';
+    require_once '../config/db.php';
+    require_once '../config/funciones.php';
     
     ?>
 
 <HEAD>
 
-    <TITLE>UNIDADES</TITLE>
+    <TITLE>Expediente</TITLE>
 
 </HEAD>
 
 <BODY>
     <center>
 
-    <h2><a href="index.php"><div style="float: left">Volver</div></a>
-    <div align="center"><img src='iconos/birrete.png'> EXPEDIENTE </div></h2>
+    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
+    <div align="center"><img src='../iconos/birrete.png'> EXPEDIENTE </div></h2>
 
     <FORM METHOD=POST ACTION="">
         <TABLE>
