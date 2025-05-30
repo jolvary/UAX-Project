@@ -1,0 +1,68 @@
+ssh-keygen -t rsa -f ./gcp -C jolvary
+
+
+
+sudo apt install apache2 -y
+sudo systemctl start apache2
+sudo systemctl enable apache2
+sudo systemctl status apache2
+sudo apt install php php-fpm -y
+sudo apt install php-mysql php-cli libapache2-mod-php -y
+
+sudo apt install git
+sudo nano /etc/ssh/sshd_config
+Match User jolvary
+    ChrootDirectory /
+    AllowTCPForwarding no
+    X11Forwarding no
+
+sudo chmod -R 777 /var/www/
+
+sudo systemctl start php8.2-fpm
+sudo systemctl enable php8.2-fpm
+sudo systemctl status php8.2-fpm
+sudo a2enmod proxy_fcgi
+ss -pl | grep php
+sudo a2enconf php8.2-fpm
+sudo systemctl restart apache2
+sudo systemctl restart php8.2-fpm
+
+
+
+sudo nano /etc/apache2/sites-available/website.conf
+<VirtualHost *:80>
+    ServerAdmin jolvary@gmail.com
+    ServerName localhost.com
+
+    DocumentRoot /var/www/UAX-Project
+    DirectoryIndex index.html index.php
+
+    <Directory /var/www/UAX-Project>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost/"
+    </FilesMatch>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+sudo a2dissite 000-default
+sudo a2ensite website
+sudo apachectl configtest
+sudo systemctl restart apache2
+
+
+
+
+sudo apt install certbot python3-certbot-apache
+sudo certbot --apache --agree-tos --redirect --email jolvary@gmail.com -d localhost.com
+sudo certbot renew --dry-run
+sudo systemctl restart apache2
+
+
+
