@@ -1,6 +1,6 @@
 <?php
 
-global $dbUser, $dbPass, $instanceHost, $conn;
+global $dbUser, $dbPass, $instanceHost, $twilioAccountSid, $twilioAuthToken, $conn;
 
 function getCustomMetadata($key) {
     $url = "http://metadata.google.internal/computeMetadata/v1/project/attributes/$key";
@@ -20,9 +20,11 @@ function getCustomMetadata($key) {
 $dbUser = getCustomMetadata('DB_USER');
 $dbPass = getCustomMetadata('DB_PASS');
 $instanceHost = getCustomMetadata('INSTANCE_HOST');
+$twilioAccountSid = getCustomMetadata('TWILIO_ACCOUNT');
+$twilioAuthToken = getCustomMetadata('TWILIO_TOKEN');
 
 // Create the connection and expose it globally
-$conn = @mysqli_connect($instanceHost, $dbUser, $dbPass, "Notas");
+$conn = @mysqli_connect($instanceHost, $dbUser, $dbPass, "notas");
 
 // Error logging (instead of fatal crash)
 if (!$conn) {
@@ -35,13 +37,13 @@ function DBCreation(){
 
     $conn = mysqli_connect ( $instanceHost, $dbUser, $dbPass);
 
-    $sql = ("drop database if exists Notas");
+    $sql = ("drop database if exists notas");
     $conn->query($sql);
 
-    $sql = ("create database if not exists Notas");
+    $sql = ("create database if not exists notas");
     $conn->query($sql);
 
-    $sql = ("use Notas");
+    $sql = ("use notas");
     $conn->query($sql);
 
     $sql = file_get_contents('notas.sql');
