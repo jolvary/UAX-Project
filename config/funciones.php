@@ -7,7 +7,7 @@ function displayAsignaturas() {
 
     global $conn;
 
-    $sql = "SELECT * FROM Notas.asignaturas";
+    $sql = "SELECT * FROM notas.asignaturas";
     $result = $conn->query($sql);
 
 	if ($result) {
@@ -54,21 +54,21 @@ function procesarCambiosAsignatura() {
         // encuentra las unidades de la asignatura
 
         $codigo = $_GET['asignatura'];
-        $sql = "SELECT clave from Notas.unidades where asignatura='$codigo'";
+        $sql = "SELECT clave from notas.unidades where asignatura='$codigo'";
         $result = $conn->query($sql);
 
         foreach ($result as $row) {
 
-            //$sql2 = "SELECT clave from Notas.instrumentos where unidad='$row'";
+            //$sql2 = "SELECT clave from notas.instrumentos where unidad='$row'";
             $unidad = $row['clave'];
-            $sql2 = "DELETE FROM Notas.instrumentos where unidad=$unidad";
+            $sql2 = "DELETE FROM notas.instrumentos where unidad=$unidad";
             $result2 = $conn->query($sql2);
-            $sql3 = "DELETE FROM Notas.unidades where clave=$unidad";
+            $sql3 = "DELETE FROM notas.unidades where clave=$unidad";
             $result3 = $conn->query($sql3);
 
         }
 
-        $sql = "DELETE FROM Notas.asignaturas where codigo=$codigo";
+        $sql = "DELETE FROM notas.asignaturas where codigo=$codigo";
         $result = $conn->query($sql);
         
     }
@@ -79,7 +79,7 @@ function procesarCambiosAsignatura() {
         $nnombre = $_POST["addNombre"];
         $nhoras = $_POST["addHoras"];
         $nprofesor = $_POST["addProfesor"];
-	    $sql = "INSERT INTO Notas.asignaturas VALUES ( '$ncodigo','$nnombre', '$nhoras', '$nprofesor' )";
+	    $sql = "INSERT INTO notas.asignaturas VALUES ( '$ncodigo','$nnombre', '$nhoras', '$nprofesor' )";
 	    $conn->query( $sql );   
 
     }
@@ -109,7 +109,7 @@ function updateAsignaturas ($ucodigo, $unewCodigo, $unombre, $uhoras, $uprofesor
 
     global $conn;
 
-	$sql = "UPDATE Notas.asignaturas SET codigo='$unewCodigo', nombre='$unombre', horas_semana='$uhoras', profesor='$uprofesor' WHERE codigo='$ucodigo'";
+	$sql = "UPDATE notas.asignaturas SET codigo='$unewCodigo', nombre='$unombre', horas_semana='$uhoras', profesor='$uprofesor' WHERE codigo='$ucodigo'";
 	$conn->query( $sql );
 
 }
@@ -120,7 +120,7 @@ function displayUnidades($asignatura) {
 
     global $conn;
 
-    $sql = "SELECT * FROM Notas.unidades where asignatura=$asignatura";
+    $sql = "SELECT * FROM notas.unidades where asignatura=$asignatura";
     $result = $conn->query($sql);
 
 	if ($result) {
@@ -160,9 +160,9 @@ function procesarCambiosUnidades($asignatura) {
     if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
 
         $unidad = $_GET['unidad'];
-	    $sql = "DELETE FROM Notas.instrumentos WHERE unidad='$unidad'";
+	    $sql = "DELETE FROM notas.instrumentos WHERE unidad='$unidad'";
 	    $conn->query( $sql );
-        $sql2 = "DELETE FROM Notas.unidades WHERE clave='$unidad'";
+        $sql2 = "DELETE FROM notas.unidades WHERE clave='$unidad'";
         $conn->query( $sql2 );
 
     }
@@ -172,7 +172,7 @@ function procesarCambiosUnidades($asignatura) {
      	$nnumero = $_POST["addNumero"];
         $nnombre = $_POST["addNombre"];
         $nporcentaje = $_POST["addPorcentaje"];
-	    $sql = "INSERT INTO Notas.unidades ( asignatura, numero, nombre, porcentaje ) VALUES ( '$asignatura', '$nnumero','$nnombre', '$nporcentaje' )";
+	    $sql = "INSERT INTO notas.unidades ( asignatura, numero, nombre, porcentaje ) VALUES ( '$asignatura', '$nnumero','$nnombre', '$nporcentaje' )";
 	    $conn->query( $sql );   
 
     }
@@ -198,7 +198,7 @@ function updateUnidades ($uclave, $unumero, $unombre, $uporcentaje) {
 
     global $conn;
 
-	$sql = "UPDATE Notas.unidades SET clave='$uclave', nombre='$unombre', numero='$unumero', porcentaje='$uporcentaje' WHERE clave='$uclave'";
+	$sql = "UPDATE notas.unidades SET clave='$uclave', nombre='$unombre', numero='$unumero', porcentaje='$uporcentaje' WHERE clave='$uclave'";
 	$conn->query( $sql );
 
 }
@@ -282,7 +282,7 @@ function deleteInstrumento() {
     if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
 
         $instrumento = $_GET['clave'];
-	    $sql = "DELETE FROM Notas.instrumentos WHERE clave='$instrumento'";
+	    $sql = "DELETE FROM notas.instrumentos WHERE clave='$instrumento'";
 	    $conn->query( $sql );
 
     }
@@ -337,11 +337,26 @@ function displayExpediente () {
      }
 }
 
-function createUserUD4($usuario, $password, $email) {
+function comprobarUsuario($usuario, $telefono) {
+
+    global $conn;
+
+    $sql = "SELECT * FROM notas.usuarios WHERE nomUsuario='$usuario' OR tlfUsuario='$telefono'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+function crearUsuario($usuario, $password, $email) {
 
         $conn = conectar();
 
-        $sql = ("SELECT * FROM UD4.usuarios WHERE nombre='$usuario'");
+        $sql = ("SELECT * FROM notas.usuarios WHERE nombre='$usuario'");
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

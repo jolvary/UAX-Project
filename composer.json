@@ -1,0 +1,6 @@
+{
+    "require": {
+        "vonage/client": "^4.1",
+        "twilio/sdk": "^8.6"
+    }
+}
