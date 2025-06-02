@@ -1,7 +1,5 @@
 ssh-keygen -t rsa -f ./gcp -C jolvary
 
-
-
 sudo apt install apache2 -y
 sudo systemctl start apache2
 sudo systemctl enable apache2
@@ -57,12 +55,14 @@ sudo apachectl configtest
 sudo systemctl restart apache2
 
 
-
-
 sudo apt install certbot python3-certbot-apache
 sudo certbot --apache --agree-tos --redirect --email jolvary@gmail.com -d localhost.com
 sudo certbot renew --dry-run
 sudo systemctl restart apache2
 
 
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+sudo composer require vonage/client
 
+sudo apt-get install openssl
