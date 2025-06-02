@@ -1,41 +1,40 @@
 <?php
 
-    include('funciones.php');
-    conectar();
-    //DBCreation();
-    //var_dump($_POST);
+    require_once '../config/funciones.php';
+    require_once '../config/db.php';
+    
     error_reporting(E_ALL ^ E_NOTICE);
-    if (!empty($_POST)) {
-        createUserUD4($_POST['usuario'], $_POST['contraseña'], $_POST['email']);
-        createUserWordpress($_POST['usuario'], $_POST['contraseña'], $_POST['email']);
-        createUserEspo($_POST['usuario'], $_POST['contraseña'], $_POST['email']);
-    }
 
 ?>
 
-<HTML>
+<html5>
+<head>
+    <title>Registro de Usuario</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+</head> 
+<body>
+    <center>
+    <br><br><br><br><br><br><br><br>
+    <h2>Registro de Usuario</h2>
+    <form method="post" action="" name="signup-form">
 
-<h1> Bienvenido a la página de inicio. </h1>
-
-<form method="post" action="register.php" name="signup-form">
-    <div class="form-element">
-        <label>Usuario</label>
-        <input type="text" name="usuario" pattern="[a-zA-Z0-9]+" required />
-    </div>
-    <br>
-    <div class="form-element">
-        <label>Contraseña</label>
-        <input type="password" name="contraseña" required />
-    </div>
-    <br>
-    <div class="form-element">
-        <label>Email</label>
-        <input type="email" name="email" required />
-    </div>
-    <br>
-    <button type="submit" name="registro" value="register">Registrarse</button>
-</form>
-
-<button onclick="location.href='login.php'">Iniciar sesión</button>
-
-</HTML>
+    <br><br><table class="table table-borderless" width="500">
+        <tr>
+            <td>Usuario</td>
+            <td><input type="text" name="usuario" pattern="[a-zA-Z0-9]+" required /></td>
+        </tr>
+        <tr>
+            <td>Contraseña</td>
+            <td><input type="password" name="contraseña" required /></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><input type="email" name="email" required /></td>
+        </tr>
+    </form>
+    </table><br><br>
+        <button type="submit" name="registro" value="register">Registrarse</button>
+        <button onclick="location.href='login.php'">Iniciar sesión</button>
+        </center>
+    </body>
+</html>
