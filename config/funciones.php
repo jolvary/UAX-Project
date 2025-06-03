@@ -352,11 +352,11 @@ function comprobarUsuario($usuario, $telefono) {
 
 }
 
-function crearUsuario($usuario, $password, $email) {
+function crearUsuario($usuario, $password, $telefono) {
 
         $conn = conectar();
 
-        $sql = ("SELECT * FROM notas.usuarios WHERE nombre='$usuario'");
+        $sql = ("INSERT INTO notas.usuarios WHERE nombre='$usuario'");
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

@@ -4,14 +4,14 @@ require_once '../config/db.php';
 require_once '../vendor/autoload.php';  // Twilio SDK
 use Twilio\Rest\Client;
 
+global $twilioAccountSid, $twilioAuthToken;
+
 //error_reporting(E_ALL ^ E_NOTICE);
 //var_dump("POST -> ", $_POST); // Debugging: check POST data
 //var_dump("GET -> ", $_GET);  // Debugging: check GET data
 
 
 session_start(); // For storing status messages
-
-global $twilioAccountSid, $twilioAuthToken;
 
 $twilio = new Client($twilioAccountSid, $twilioAuthToken);
 
@@ -30,27 +30,37 @@ global $sid;
 if (isset($_POST['sendSMS'])) {
 
     $telefono = $_POST['tlf'];
-    $_SESSION['usuario'] = $_POST['usuario'];
+    $usuario = $_SESSION['usuario'] = $_POST['usuario'];
     $_SESSION['contraseña'] = $_POST['contraseña'];
+    $_SESSION['tlf'] = $telefono;
 
     if (!empty($telefono) && preg_match('/^\+?[1-9]\d{1,14}$/', $telefono)) {
-        try {
-
-            $verification = $twilio->verify
-                                   ->v2
-                                   ->services($sid)
-                                   ->verifications
-                                   ->create($telefono, "sms");
-
-            $_SESSION['sid'] = $sid;
-            
-        } catch (Exception $e) {
+        
+        if (comprobarUsuario($usuario, $telefono) == TRUE) {
             function alert($msg) {
                 echo "<script type='text/javascript'>alert('$msg');</script>";
             }
-            
-            alert("Error al enviar código: " . $e->getMessage());
+            alert("El usuario o el teléfono ya están registrados.");
 
+        } else {
+            try {
+
+                $verification = $twilio->verify
+                                    ->v2
+                                    ->services($sid)
+                                    ->verifications
+                                    ->create($telefono, "sms");
+
+                $_SESSION['sid'] = $sid;
+                
+            } catch (Exception $e) {
+                function alert($msg) {
+                    echo "<script type='text/javascript'>alert('$msg');</script>";
+                }
+                
+                alert("Error al enviar código: " . $e->getMessage());
+
+            }
         }
     } else {
         function alert($msg) {
@@ -74,39 +84,48 @@ if (isset($_POST['registro'])) {
     );
 
     if (!empty($codigo) && !empty($telefono) && !empty($sid)) {
-        try {
-            
-            $verificationCheck = $twilio->verify
-                                        ->v2
-                                        ->services($_SESSION['sid'])
-                                        ->verificationChecks
-                                        ->create([
-                                            'to' => $telefono,
-                                            'code' => $codigo
-                                        ]);
+        
+        //var_dump(comprobarUsuario($usuario, $telefono)); // Debugging: check user existence
 
-            if ($verificationCheck->status === "approved") {
-
-                header("Location: http://jolvary.com/users/login.php");
-                exit();
-                
-            } else {
-
-                function alert($msg) {
-                    echo "<script type='text/javascript'>alert('$msg');</script>";
-                }
-                alert("Código incorrecto. Por favor intente de nuevo.");                
-
-            }
-        } catch (Exception $e) {
-            
+        if (comprobarUsuario($usuario, $telefono) == TRUE) {
             function alert($msg) {
                 echo "<script type='text/javascript'>alert('$msg');</script>";
             }
+            alert("El usuario o el teléfono ya están registrados.");
 
-            alert("Error al verificar el código: " . $e->getMessage());
-            
+        } else {
+            try {
+                $verificationCheck = $twilio->verify
+                                            ->v2
+                                            ->services($_SESSION['sid'])
+                                            ->verificationChecks
+                                            ->create([
+                                                'to' => $telefono,
+                                                'code' => $codigo
+                                            ]);
+                if ($verificationCheck->status === "approved") {
+
+                    crearUsuario($usuario, $contraseña, $telefono);
+
+                    header("Location: https://jolvary.com/users/login.php");
+                    exit();
+                    
+                } else {
+                    function alert($msg) {
+                        echo "<script type='text/javascript'>alert('$msg');</script>";
+                    }
+                    alert("Código incorrecto. Por favor intente de nuevo.");                
+                }
+            } catch (Exception $e) {
+                
+                function alert($msg) {
+                    echo "<script type='text/javascript'>alert('$msg');</script>";
+                }
+                alert("Error al verificar el código: " . $e->getMessage());
+                
+            }
         }
+
     } else {
 
         function alert($msg) {
@@ -119,45 +138,95 @@ if (isset($_POST['registro'])) {
 }
 ?>
 
-<html5>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
+    <meta charset="UTF-8">
     <title>Registro de Usuario</title>
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
-</head> 
-<body>
-<center>
-<br><br><br><br><br><br><br><br>
-<h2>Registro de Usuario</h2><br>
-<form method="post" action="">
-    <table class="table table-borderless" width="400">
-        <tr>
-            <td style="width:27%">Usuario</td>
-            <td style="width:43%"><input size="22" type="text" name="usuario" pattern="[a-zA-Z0-9]+" value="<?php echo $_SESSION['usuario']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Contraseña</td>
-            <td><input size="22" type="password" name="contraseña" value="<?php echo $_SESSION['contraseña']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Teléfono</td>
-            <td><input size="22" type="text" name="tlf" value="<?php echo $_SESSION['tlf']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="width:27%">Código</td>
-            <td style="width:43%"><input size="22" type="text" name="code" /></td>
-            <td style="width:27%"><button type="submit" name="sendSMS" value="sendSMS">Recibir código</button></td>
-        </tr>
-    </table>
-    
-    <br>
-    <button onclick="location.href='http://jolvary.com/users/register.php'">Registrarse</button>
-    <button type="submit" name="login" value="login">Iniciar Sesión</button>
-    
-</form>
-</center>
+    <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
+    <link rel="stylesheet" href="https://jolvary.com/assets/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg mt-5">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Registro de Usuario</h4>                        
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="">
+                            <div class="form-group">
+                                <label for="usuario">Usuario</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="usuario" 
+                                    name="usuario" 
+                                    pattern="[a-zA-Z0-9]+" 
+                                    value="<?php echo htmlspecialchars($_SESSION['usuario'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="contraseña">Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="contraseña" 
+                                    name="contraseña" 
+                                    value="<?php echo htmlspecialchars($_SESSION['contraseña'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="tlf">Teléfono</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="tlf" 
+                                    name="tlf" 
+                                    value="<?php echo htmlspecialchars($_SESSION['tlf'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="code">Código</label>
+                                <div class="input-group">
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="code" 
+                                        name="code"
+                                    >
+                                    <div class="input-group-append">
+                                        <button 
+                                            class="btn btn-outline-secondary" 
+                                            type="submit" 
+                                            name="sendSMS" 
+                                            value="sendSMS"
+                                        >
+                                            Recibir código
+                                        </button>
+                                    </div>
+                                </div>
+                            </div><br>
+                            <div class="d-flex justify-content-between">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-success" 
+                                    name="registro" 
+                                    value="register"
+                                >
+                                    Registrarse
+                                </button>
+                                <a href="https://jolvary.com/users/login.php" class="btn btn-secondary">Iniciar sesión</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

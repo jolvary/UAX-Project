@@ -104,7 +104,7 @@ if (isset($_POST['registro'])) {
                                                 'code' => $codigo
                                             ]);
                 if ($verificationCheck->status === "approved") {
-                    header("Location: http://jolvary.com/users/login.php");
+                    header("Location: https://jolvary.com/users/login.php");
                     exit();
                     
                 } else {
@@ -135,44 +135,95 @@ if (isset($_POST['registro'])) {
 }
 ?>
 
-<html5>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
+    <meta charset="UTF-8">
     <title>Registro de Usuario</title>
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
-</head> 
-<body>
-<center>
-<br><br><br><br><br><br><br><br>
-<h2>Registro de Usuario</h2><br>
-<form method="post" action="">
-    <table class="table table-borderless" width="400">
-        <tr>
-            <td style="width:27%">Usuario</td>
-            <td style="width:43%"><input size="22" type="text" name="usuario" pattern="[a-zA-Z0-9]+" value="<?php echo $_SESSION['usuario']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Contraseña</td>
-            <td><input size="22" type="password" name="contraseña" value="<?php echo $_SESSION['contraseña']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Teléfono</td>
-            <td><input size="22" type="text" name="tlf" value="<?php echo $_SESSION['tlf']; ?>" required /></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="width:27%">Código</td>
-            <td style="width:43%"><input size="22" type="text" name="code" /></td>
-            <td style="width:27%"><button type="submit" name="sendSMS" value="sendSMS">Recibir código</button></td>
-        </tr>
-    </table>
-    
-    <br>
-    <button type="submit" name="registro" value="register">Registrarse</button>
-    <button onclick="location.href='http://jolvary.com/users/login.php'">Iniciar sesión</button>
-</form>
-</center>
+    <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
+    <link rel="stylesheet" href="https://jolvary.com/assets/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg mt-5">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Registro de Usuario</h4>                        
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="">
+                            <div class="form-group">
+                                <label for="usuario">Usuario</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="usuario" 
+                                    name="usuario" 
+                                    pattern="[a-zA-Z0-9]+" 
+                                    value="<?php echo htmlspecialchars($_SESSION['usuario'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="contraseña">Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="contraseña" 
+                                    name="contraseña" 
+                                    value="<?php echo htmlspecialchars($_SESSION['contraseña'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="tlf">Teléfono</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="tlf" 
+                                    name="tlf" 
+                                    value="<?php echo htmlspecialchars($_SESSION['tlf'] ?? '', ENT_QUOTES); ?>" 
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="code">Código</label>
+                                <div class="input-group">
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="code" 
+                                        name="code"
+                                    >
+                                    <div class="input-group-append">
+                                        <button 
+                                            class="btn btn-outline-secondary" 
+                                            type="submit" 
+                                            name="sendSMS" 
+                                            value="sendSMS"
+                                        >
+                                            Recibir código
+                                        </button>
+                                    </div>
+                                </div>
+                            </div><br>
+                            <div class="d-flex justify-content-between">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-success" 
+                                    name="registro" 
+                                    value="register"
+                                >
+                                    Registrarse
+                                </button>
+                                <a href="https://jolvary.com/users/login.php" class="btn btn-secondary">Iniciar sesión</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
