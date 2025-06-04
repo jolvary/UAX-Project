@@ -4,11 +4,11 @@ require_once '../config/db.php';
 require_once '../vendor/autoload.php';  // Twilio SDK
 use Twilio\Rest\Client;
 
-global $twilioAccountSid, $twilioAuthToken;
+global $twilioAccountSid, $twilioAuthToken, $conn;
 
 //error_reporting(E_ALL ^ E_NOTICE);
-//var_dump("POST -> ", $_POST); // Debugging: check POST data
-//var_dump("GET -> ", $_GET);  // Debugging: check GET data
+//var_dump("POST -> ", $_POST);
+//var_dump("GET -> ", $_GET);
 
 
 session_start(); // For storing status messages
@@ -16,7 +16,7 @@ session_start(); // For storing status messages
 $twilio = new Client($twilioAccountSid, $twilioAuthToken);
 
 $service = $twilio->verify->v2->services->create(
-                "My First Verify Service" // FriendlyName
+                "Login Verify Service" // FriendlyName
             );
 
 $sid = $service->sid;
@@ -24,74 +24,69 @@ $sid = $service->sid;
 global $sid;
 
 //var_dump("SID -> ", $sid);
-//var_dump("SESSION -> ", $_SESSION); // Debugging: check session data
+//var_dump("SESSION -> ", $_SESSION);
 
 // Handle "Send SMS" button click
 if (isset($_POST['sendSMS'])) {
 
-    $telefono = $_POST['tlf'];
     $usuario = $_SESSION['usuario'] = $_POST['usuario'];
-    $_SESSION['contraseña'] = $_POST['contraseña'];
-    $_SESSION['tlf'] = $telefono;
+    $contraseña = $_SESSION['contraseña'] = $_POST['contraseña'];
+    $telefono = iniSesion($usuario, $contraseña, 'check');
 
-    if (!empty($telefono) && preg_match('/^\+?[1-9]\d{1,14}$/', $telefono)) {
-        
-        if (comprobarUsuario($usuario, $telefono) == TRUE) {
-            function alert($msg) {
-                echo "<script type='text/javascript'>alert('$msg');</script>";
-            }
-            alert("El usuario o el teléfono ya están registrados.");
-
-        } else {
-            try {
-
-                $verification = $twilio->verify
-                                    ->v2
-                                    ->services($sid)
-                                    ->verifications
-                                    ->create($telefono, "sms");
-
-                $_SESSION['sid'] = $sid;
-                
-            } catch (Exception $e) {
-                function alert($msg) {
-                    echo "<script type='text/javascript'>alert('$msg');</script>";
-                }
-                
-                alert("Error al enviar código: " . $e->getMessage());
-
-            }
-        }
-    } else {
+    if ($telefono == FALSE) {
         function alert($msg) {
             echo "<script type='text/javascript'>alert('$msg');</script>";
         }
-        
-        alert("Por favor ingrese un número de teléfono válido.");
+        alert("El usuario o contraseña no son correctos.");
+
+    } else {
+        try {
+
+            $verification = $twilio->verify
+                                ->v2
+                                ->services($sid)
+                                ->verifications
+                                ->create($telefono, "sms");
+
+            $_SESSION['sid'] = $sid;
+            $_SESSION['telefono'] = $telefono; 
+                
+        } catch (Exception $e) {
+            function alert($msg) {
+                echo "<script type='text/javascript'>alert('$msg');</script>";
+            }
+                
+            alert("Error al enviar código: " . $e->getMessage());
+
+        }
     }
 }
 
-// Handle "Registrarse" button click
-if (isset($_POST['registro'])) {
+if (isset($_POST['login'])) {
+
     $usuario = $_POST['usuario'];
     $contraseña = $_POST['contraseña'];
-    $telefono = $_POST['tlf'];
     $codigo = $_POST['code'];
     $sid = $_SESSION['sid'];
+    $telefono = $_SESSION['telefono'];
 
     $service = $twilio->verify->v2->services->create(
         "My First Verify Service"
     );
 
-    if (!empty($codigo) && !empty($telefono) && !empty($sid)) {
+    if (!empty($codigo) && !empty($usuario) && !empty($sid)) {
         
         //var_dump(comprobarUsuario($usuario, $telefono)); // Debugging: check user existence
 
-        if (comprobarUsuario($usuario, $telefono) == TRUE) {
+        [$idUser, $rolUser] = iniSesion($usuario, $contraseña, 'login');
+        $_SESSION['idUsuario'] = $_POST['idUsuario'] = $idUser;
+        $_SESSION['roldUsuario'] = $_POST['rolUsuario'] = $rolUser;
+
+        if ($idUser == FALSE) {
             function alert($msg) {
                 echo "<script type='text/javascript'>alert('$msg');</script>";
             }
-            alert("El usuario o el teléfono ya están registrados.");
+            alert("El usuario, contraseña o teléfono no son correctos.");
 
         } else {
             try {
@@ -103,11 +98,10 @@ if (isset($_POST['registro'])) {
                                                 'to' => $telefono,
                                                 'code' => $codigo
                                             ]);
+
                 if ($verificationCheck->status === "approved") {
 
-                    crearUsuario($usuario, $contraseña, $telefono);
-
-                    header("Location: https://jolvary.com/users/login.php");
+                    header("Location: https://jolvary.com/sites/asignaturas.php");
                     exit();
                     
                 } else {
@@ -142,7 +136,7 @@ if (isset($_POST['registro'])) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Usuario</title>
+    <title>Iniciar Sesión</title>
     <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
     <link rel="stylesheet" href="https://jolvary.com/assets/css/bootstrap.min.css">
 </head>
@@ -152,7 +146,7 @@ if (isset($_POST['registro'])) {
             <div class="col-md-5">
                 <div class="card shadow-lg mt-5">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Registro de Usuario</h4>                        
+                        <h4 class="mb-0">Inicio de Sesión</h4>                        
                     </div>
                     <div class="card-body">
                         <form method="post" action="">
@@ -180,15 +174,6 @@ if (isset($_POST['registro'])) {
                                 >
                             </div>
                             <div class="form-group">
-                                <label for="tlf">Teléfono</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="tlf" 
-                                    name="tlf" 
-                                    value="<?php echo htmlspecialchars($_SESSION['tlf'] ?? '', ENT_QUOTES); ?>" 
-                                    required
-                                >
                             </div>
                             <div class="form-group">
                                 <label for="code">Código</label>
@@ -215,12 +200,13 @@ if (isset($_POST['registro'])) {
                                 <button 
                                     type="submit" 
                                     class="btn btn-success" 
-                                    name="registro" 
-                                    value="register"
+                                    name="login" 
+                                    value="login"
+                                    method="POST"
                                 >
-                                    Registrarse
+                                    Iniciar Sesión
                                 </button>
-                                <a href="https://jolvary.com/users/login.php" class="btn btn-secondary">Iniciar sesión</a>
+                                <a href="https://jolvary.com/users/register.php" class="btn btn-secondary" >Registrarse</a>
                             </div>
                         </form>
                     </div>

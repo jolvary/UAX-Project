@@ -2,26 +2,46 @@
 
 // Asignaturas
 require_once __DIR__ . '/db.php';
+global $conn;
+
 
 function displayAsignaturas() {
 
     global $conn;
 
-    $sql = "SELECT * FROM notas.asignaturas";
+    $idUser = $_SESSION['idUsuario'];
+
+    $sql = "SELECT A.idAsignatura, A.nomAsignatura, A.horasSemana, P.nomProfesor FROM notas.asignaturas AS A 
+            INNER JOIN notas.profesores AS P ON A.idProfesor = P.idProfesor
+            INNER JOIN notas.unidades AS U ON A.idAsignatura = U.idAsignatura
+            INNER JOIN notas.instrumentos AS I ON U.idUnidad = I.idUnidad
+            INNER JOIN notas.calificaciones AS C ON I.idInstrumento = C.idInstrumento
+            INNER JOIN notas.usuarios as Us ON C.idUsuario = Us.idUsuario
+            where Us.idUsuario = $idUser
+            GROUP BY A.idAsignatura";
+
     $result = $conn->query($sql);
 
-	if ($result) {
+	if ($result->num_rows > 0) {
 
         $cont=0;
+
+        echo "<TR>";
+            echo "<TH class='text-center'>CÓDIGO</TH>";
+            echo "<TH class='text-center'>NOMBRE</TH>";
+            echo "<TH class='text-center'>HORAS</TH>";
+            echo "<TH class='text-center'>PROFESOR</TH>";
+            echo "<tbodyclass='table-group-divider' >";
+        echo "</TR>";
 
 		while ($fila = mysqli_fetch_row($result)) {
 
             echo "<TR>";
 	        echo "    <INPUT TYPE='hidden' name='codigo[$cont]' value='$fila[0]'>";
-	        echo "    <TD><INPUT TYPE='text' name='newCodigo[$cont]' value='$fila[0]' size='10'></TD>";
-	        echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='$fila[1]' size='40'></TD>";
-	        echo "    <TD><INPUT TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='9'></TD>";
-	        echo "    <TD><INPUT TYPE='text' name='profesor[$cont]' value='$fila[3]' size='40'></TD>";
+	        echo "    <TD class='text-center'><INPUT TYPE='text' name='newCodigo[$cont]' value='$fila[0]' size='3'></TD>";
+	        echo "    <TD class='text-center'><INPUT TYPE='text' name='nombre[$cont]' value='$fila[1]' size='50'></TD>";
+	        echo "    <TD class='text-center'><INPUT TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='2'></TD>";
+	        echo "    <TD class='text-center'><INPUT TYPE='text' name='profesor[$cont]' value='$fila[3]' size='44'></TD>";
 	        echo "    <TD><a href='index.php?operacion=eliminar&asignatura=$fila[0]'><img src='../iconos/remove32.png'></a></TD>";
             echo "    <TD><a href='/sites/unidades.php?asignatura=$fila[0]'><img src='../iconos/tarta.png'></a></TD>";
             echo "    <TD><a href='/sites/instrumentos.php?asignatura=$fila[0]'><img src='../iconos/smile.png'></a></TD>";
@@ -33,10 +53,10 @@ function displayAsignaturas() {
         }
 
         echo "<TR>";
-	    echo "    <TD><INPUT TYPE='text' name='addCodigo' size='10'></TD>";
-	    echo "    <TD><INPUT TYPE='text' name='addNombre' size='40'></TD>";
-	    echo "    <TD><INPUT TYPE='text' name='addHoras' size='9'></TD>";
-	    echo "    <TD><INPUT TYPE='text' name='addProfesor' size='40'></TD>";
+	    echo "    <TD class='text-center'><INPUT TYPE='text' name='addCodigo' size='3'></TD>";
+	    echo "    <TD class='text-center'><INPUT TYPE='text' name='addNombre' size='50'></TD>";
+	    echo "    <TD class='text-center'><INPUT TYPE='text' name='addHoras' size='2'></TD>";
+	    echo "    <TD class='text-center'><INPUT TYPE='text' name='addProfesor' size='44'></TD>";
         echo "</TR>";
 
 		mysqli_free_result($result);
@@ -354,35 +374,28 @@ function comprobarUsuario($usuario, $telefono) {
 
 function crearUsuario($usuario, $password, $telefono) {
 
-        $conn = conectar();
+    global $conn;
 
-        $sql = ("INSERT INTO notas.usuarios WHERE nombre='$usuario'");
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            echo '<p>Este nombre de usuario ya ha sido registrado en el sistema.<p>';
-        }
-
-        if ($result->num_rows == 0) {
-            $sql = ("INSERT INTO UD4.usuarios(nombre,password,email) VALUES ('$usuario','$password','$email')");
-            $result = $conn->query($sql);
-
-            if ($result) {
-                echo '<p class="success">Te has registrado correctamente.</p>';
-            } else {
-                echo '<p class="error">Algo salió mal.</p>';
-            }
-
-        }
+    $sql = "INSERT INTO notas.usuarios (nomUsuario, passUsuario, tlfUsuario) VALUES ('$usuario', MD5('$password'), '$telefono')";
+    $result = $conn->query( $sql ); 
 
 }
 
-function iniSesion($usuario, $password) {
+function iniSesion($usuario, $password, $accion) {
 
-    $conn = conectar();
-    $sql = "SELECT * FROM UD4.usuarios WHERE nombre = '$usuario' AND password = '$password'";
+    global $conn;
 
-    return mysqli_query($conn, $sql)->fetch_assoc();
+    $sql = "SELECT * FROM notas.usuarios WHERE nomUsuario = '$usuario' AND passUsuario = MD5('$password')";
+    $result = $conn->query($sql);
+    $row = $result -> fetch_assoc();
+
+   if ($result->num_rows == 0) {
+        return false;
+    } else if ($result->num_rows > 0 && $accion == "check") {
+        return $row['tlfUsuario'];
+    } else if ($result->num_rows > 0 && $accion == "login") {
+        return [$row['idUsuario'], $row['rolUsuario']];
+    }
 
 }
 

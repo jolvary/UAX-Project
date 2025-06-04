@@ -11,12 +11,12 @@ global $twilioAccountSid, $twilioAuthToken;
 //var_dump("GET -> ", $_GET);  // Debugging: check GET data
 
 
-session_start(); // For storing status messages
+session_start();
 
 $twilio = new Client($twilioAccountSid, $twilioAuthToken);
 
 $service = $twilio->verify->v2->services->create(
-                "My First Verify Service" // FriendlyName
+                "Register Verify Service" // FriendlyName
             );
 
 $sid = $service->sid;
@@ -26,7 +26,6 @@ global $sid;
 //var_dump("SID -> ", $sid);
 //var_dump("SESSION -> ", $_SESSION); // Debugging: check session data
 
-// Handle "Send SMS" button click
 if (isset($_POST['sendSMS'])) {
 
     $telefono = $_POST['tlf'];
@@ -71,7 +70,6 @@ if (isset($_POST['sendSMS'])) {
     }
 }
 
-// Handle "Registrarse" button click
 if (isset($_POST['registro'])) {
     $usuario = $_POST['usuario'];
     $contraseña = $_POST['contraseña'];
@@ -85,7 +83,7 @@ if (isset($_POST['registro'])) {
 
     if (!empty($codigo) && !empty($telefono) && !empty($sid)) {
         
-        //var_dump(comprobarUsuario($usuario, $telefono)); // Debugging: check user existence
+        //var_dump(comprobarUsuario($usuario, $telefono));
 
         if (comprobarUsuario($usuario, $telefono) == TRUE) {
             function alert($msg) {
@@ -103,15 +101,24 @@ if (isset($_POST['registro'])) {
                                                 'to' => $telefono,
                                                 'code' => $codigo
                                             ]);
-                if ($verificationCheck->status === "approved") {
+
+                //var_dump("Verification check status: ", $verificationCheck->status);
+
+                if ($verificationCheck->status == "approved") {
+
+                    crearUsuario($usuario, $contraseña, $telefono);
+
                     header("Location: https://jolvary.com/users/login.php");
                     exit();
                     
                 } else {
+
                     function alert($msg) {
                         echo "<script type='text/javascript'>alert('$msg');</script>";
                     }
+
                     alert("Código incorrecto. Por favor intente de nuevo.");                
+                
                 }
             } catch (Exception $e) {
                 
