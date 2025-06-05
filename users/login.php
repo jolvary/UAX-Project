@@ -7,12 +7,12 @@ use Twilio\Rest\Client;
 global $twilioAccountSid, $twilioAuthToken, $conn;
 
 //error_reporting(E_ALL ^ E_NOTICE);
-//var_dump("POST -> ", $_POST);
-//var_dump("GET -> ", $_GET);
+var_dump("POST -> ", $_POST);
+var_dump("GET -> ", $_GET);
 
 
 session_start(); // For storing status messages
-
+/*
 $twilio = new Client($twilioAccountSid, $twilioAuthToken);
 
 $service = $twilio->verify->v2->services->create(
@@ -61,7 +61,7 @@ if (isset($_POST['sendSMS'])) {
         }
     }
 }
-
+*/
 if (isset($_POST['login'])) {
 
     $usuario = $_POST['usuario'];
@@ -70,17 +70,24 @@ if (isset($_POST['login'])) {
     $sid = $_SESSION['sid'];
     $telefono = $_SESSION['telefono'];
 
+    [$idUser, $rolUser] = iniSesion($usuario, $contraseña, 'login');
+    $_SESSION['idUsuario'] = $idUser;
+    $_SESSION['rolUsuario'] = $rolUser;
+
+    header("Location: https://jolvary.com/sites/asignaturas.php");
+
     $service = $twilio->verify->v2->services->create(
         "My First Verify Service"
     );
 
+/*
     if (!empty($codigo) && !empty($usuario) && !empty($sid)) {
         
         //var_dump(comprobarUsuario($usuario, $telefono)); // Debugging: check user existence
 
         [$idUser, $rolUser] = iniSesion($usuario, $contraseña, 'login');
         $_SESSION['idUsuario'] = $_POST['idUsuario'] = $idUser;
-        $_SESSION['roldUsuario'] = $_POST['rolUsuario'] = $rolUser;
+        $_SESSION['rolUsuario'] = $_POST['rolUsuario'] = $rolUser;
 
         if ($idUser == FALSE) {
             function alert($msg) {
@@ -128,7 +135,7 @@ if (isset($_POST['login'])) {
 
         alert("Por favor solicite e ingrese el código recibido por SMS.");
 
-    }
+    }*/
 }
 ?>
 

@@ -9,15 +9,19 @@
 
     session_start();
 
-    var_dump($_SESSION);
-    var_dump($_POST);
+    if (!isset($_SESSION['idUsuario'])) {
+        header("Location: ../users/login.php");
+        exit();
+    }
+
+    $idUser = $_SESSION['idUsuario'];
+    $rolUser = $_SESSION['rolUsuario'];
 
     ?>
 
 <HEAD>
 
     <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
-
     <TITLE>RA5</TITLE>
     <link rel="stylesheet" href="https://jolvary.com/assets/css/bootstrap.min.css">
 
@@ -29,15 +33,19 @@
     <FORM METHOD=POST ACTION="">
         <TABLE>
             <?php 
-                //var_dump($_GET);
-                //var_dump($_POST);
                 echo "<br>";
-                procesarCambiosAsignatura();
-                displayAsignaturas();
+                displayAsignaturas(40, 'admin');
             ?>
         </TABLE><br/>
-		<INPUT TYPE="submit" name="procesar" value="Guardar Cambios">
-		<INPUT TYPE="submit" name="procesar" value="Descartar Cambios">            
+        <?php
+            if ($rolUser == 'alumno') {
+                return;
+            } else {
+                echo "<INPUT TYPE='submit' name='procesar' value='Guardar Cambios'>";
+		        echo "<INPUT TYPE='submit' name='procesar' value='Descartar Cambios'>";
+            }
+            
+        ?>
     </FORM>
     </center>
 </BODY>

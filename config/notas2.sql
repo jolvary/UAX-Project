@@ -18,7 +18,7 @@ CREATE TABLE usuarios (
 );
 
 CREATE TABLE profesores (
-    idProfesor INT NOT NULL AUTO_INCREMENT,
+    idProfesor INT NOT NULL,
     nomProfesor VARCHAR(45) NOT NULL,
     tlfProfesor VARCHAR(12) NOT NULL,
     PRIMARY KEY (idProfesor),
@@ -31,7 +31,7 @@ CREATE TABLE asignaturas (
     horasSemana INT NOT NULL,
     idProfesor INT NOT NULL,
     PRIMARY KEY (idAsignatura),
-    FOREIGN KEY (idProfesor) REFERENCES profesores(idProfesor)
+    FOREIGN KEY (idProfesor) REFERENCES profesores(idProfesor) ON DELETE CASCADE
 );
 
 CREATE TABLE unidades (
@@ -41,7 +41,7 @@ CREATE TABLE unidades (
     numUnidad INT NOT NULL,
     pesoUnidad INT NOT NULL,
     PRIMARY KEY (idUnidad),
-    FOREIGN KEY (idAsignatura) REFERENCES asignaturas(idAsignatura)
+    FOREIGN KEY (idAsignatura) REFERENCES asignaturas(idAsignatura) ON DELETE CASCADE
 );
 
 CREATE TABLE instrumentos (
@@ -50,7 +50,7 @@ CREATE TABLE instrumentos (
     idUnidad INT NOT NULL,
     pesoInstrumento INT NOT NULL,
     PRIMARY KEY (idInstrumento),
-    FOREIGN KEY (idUnidad) REFERENCES unidades(idUnidad)
+    FOREIGN KEY (idUnidad) REFERENCES unidades(idUnidad) ON DELETE CASCADE
 );
 
 CREATE TABLE calificaciones (
@@ -59,26 +59,24 @@ CREATE TABLE calificaciones (
     idUsuario INT NOT NULL,
     calificacion DECIMAL(5,2) NOT NULL,
     PRIMARY KEY (idCalificacion),
-    FOREIGN KEY (idInstrumento) REFERENCES instrumentos(idInstrumento),
+    FOREIGN KEY (idInstrumento) REFERENCES instrumentos(idInstrumento) ON DELETE CASCADE, 
     FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
 );
 
-CREATE PROCEDURE sp_sync_profesor(IN p_nomUsuario VARCHAR(45), IN p_tlfUsuario VARCHAR(12))
+USE notas;
+
+CREATE PROCEDURE sp_sync_profesor(IN p_idUsuario INT, IN p_nomUsuario VARCHAR(45), IN p_tlfUsuario VARCHAR(12))
 BEGIN
     DECLARE v_profesor_id INT;
-
-    -- Check if a profesor with this phone already exists
     SELECT idProfesor INTO v_profesor_id
     FROM profesores
     WHERE tlfProfesor = p_tlfUsuario
     LIMIT 1;
 
     IF v_profesor_id IS NULL THEN
-        -- Insert new profesor
-        INSERT INTO profesores (nomProfesor, tlfProfesor)
-        VALUES (p_nomUsuario, p_tlfUsuario);
+        INSERT INTO profesores (idProfesor, nomProfesor, tlfProfesor)
+        VALUES (p_idUsuario, p_nomUsuario, p_tlfUsuario);
     ELSE
-        -- Update existing profesor
         UPDATE profesores
         SET nomProfesor = p_nomUsuario
         WHERE idProfesor = v_profesor_id;
@@ -90,7 +88,7 @@ AFTER INSERT ON usuarios
 FOR EACH ROW
 BEGIN
     IF NEW.rolUsuario = 'profesor' THEN
-        CALL sp_sync_profesor(NEW.nomUsuario, NEW.tlfUsuario);
+        CALL sp_sync_profesor(NEW.idUsuario, NEW.nomUsuario, NEW.tlfUsuario);
     END IF;
 END;
 
@@ -99,377 +97,17 @@ AFTER UPDATE ON usuarios
 FOR EACH ROW
 BEGIN
     IF NEW.rolUsuario = 'profesor' THEN
-        CALL sp_sync_profesor(NEW.nomUsuario, NEW.tlfUsuario);
+        CALL sp_sync_profesor(NEW.idUsuario, NEW.nomUsuario, NEW.tlfUsuario);
     END IF;
 END;
 
-USE notas;
 
--- Insert 31 alumnos
-INSERT INTO usuarios (nomUsuario, passUsuario, tlfUsuario, rolUsuario) VALUES
-('Alumno1', 'password123', '+600000001', 'alumno'),
-('Alumno2', 'password123', '+600000002', 'alumno'),
-('Alumno3', 'password123', '+600000003', 'alumno'),
-('Alumno4', 'password123', '+600000004', 'alumno'),
-('Alumno5', 'password123', '+600000005', 'alumno'),
-('Alumno6', 'password123', '+600000006', 'alumno'),
-('Alumno7', 'password123', '+600000007', 'alumno'),
-('Alumno8', 'password123', '+600000008', 'alumno'),
-('Alumno9', 'password123', '+600000009', 'alumno'),
-('Alumno10', 'password123', '+600000010', 'alumno'),
-('Alumno11', 'password123', '+600000011', 'alumno'),
-('Alumno12', 'password123', '+600000012', 'alumno'),
-('Alumno13', 'password123', '+600000013', 'alumno'),
-('Alumno14', 'password123', '+600000014', 'alumno'),
-('Alumno15', 'password123', '+600000015', 'alumno'),
-('Alumno16', 'password123', '+600000016', 'alumno'),
-('Alumno17', 'password123', '+600000017', 'alumno'),
-('Alumno18', 'password123', '+600000018', 'alumno'),
-('Alumno19', 'password123', '+600000019', 'alumno'),
-('Alumno20', 'password123', '+600000020', 'alumno'),
-('Alumno21', 'password123', '+600000021', 'alumno'),
-('Alumno22', 'password123', '+600000022', 'alumno'),
-('Alumno23', 'password123', '+600000023', 'alumno'),
-('Alumno24', 'password123', '+600000024', 'alumno'),
-('Alumno25', 'password123', '+600000025', 'alumno'),
-('Alumno26', 'password123', '+600000026', 'alumno'),
-('Alumno27', 'password123', '+600000027', 'alumno'),
-('Alumno28', 'password123', '+600000028', 'alumno'),
-('Alumno29', 'password123', '+600000029', 'alumno'),
-('Alumno30', 'password123', '+600000030', 'alumno'),
-('Alumno31', 'password123', '+600000031', 'alumno');
+INSERT INTO `usuarios` VALUES (1,'Alumno1','password123','+600000001','alumno'),(2,'Alumno2','password123','+600000002','alumno'),(3,'Alumno3','password123','+600000003','alumno'),(4,'Alumno4','password123','+600000004','alumno'),(5,'Alumno5','password123','+600000005','alumno'),(6,'Alumno6','password123','+600000006','alumno'),(7,'Alumno7','password123','+600000007','alumno'),(8,'Alumno8','password123','+600000008','alumno'),(9,'Alumno9','password123','+600000009','alumno'),(10,'Alumno10','password123','+600000010','alumno'),(11,'Alumno11','password123','+600000011','alumno'),(12,'Alumno12','password123','+600000012','alumno'),(13,'Alumno13','password123','+600000013','alumno'),(14,'Alumno14','password123','+600000014','alumno'),(15,'Alumno15','password123','+600000015','alumno'),(16,'Alumno16','password123','+600000016','alumno'),(17,'Alumno17','password123','+600000017','alumno'),(18,'Alumno18','password123','+600000018','alumno'),(19,'Alumno19','password123','+600000019','alumno'),(20,'Alumno20','password123','+600000020','alumno'),(21,'Alumno21','password123','+600000021','alumno'),(22,'Alumno22','password123','+600000022','alumno'),(23,'Alumno23','password123','+600000023','alumno'),(24,'Alumno24','password123','+600000024','alumno'),(25,'Alumno25','password123','+600000025','alumno'),(26,'Alumno26','password123','+600000026','alumno'),(27,'Alumno27','password123','+600000027','alumno'),(28,'Alumno28','password123','+600000028','alumno'),(29,'Alumno29','password123','+600000029','alumno'),(30,'Alumno30','password123','+600000030','alumno'),(31,'Alumno31','password123','+600000031','alumno'),(32,'Profesor1','password123','+700000001','profesor'),(33,'Profesor2','password123','+700000002','profesor'),(34,'Profesor3','password123','+700000003','profesor'),(35,'Profesor4','password123','+700000004','profesor'),(36,'Profesor5','password123','+700000005','profesor'),(40,'jolvary','4d186321c1a7f0f354b297e8914ab240','+34661076008','alumno');
 
--- Insert 5 profesores
-INSERT INTO usuarios (nomUsuario, passUsuario, tlfUsuario, rolUsuario) VALUES
-('Profesor1', 'password123', '+700000001', 'profesor'),
-('Profesor2', 'password123', '+700000002', 'profesor'),
-('Profesor3', 'password123', '+700000003', 'profesor'),
-('Profesor4', 'password123', '+700000004', 'profesor'),
-('Profesor5', 'password123', '+700000005', 'profesor');
+INSERT INTO `asignaturas` VALUES (369,'IMPLANTACIÓN DE SISTEMAS OPERATIVOS',12,32),(370,'PLANIFICACIÓN Y ADMINISTRACIÓN DE REDES',8,33),(371,'FUNDAMENTOS DE HARDWARE',6,32),(372,'GESTIÓN DE BASES DE DATOS',8,34),(373,'LENGUAJES DE MARCAS Y SISTEMAS ',8,34),(374,'ADMINISTRACIÓN DE SISTEMAS OPERATIVOS',12,32),(375,'SERVICIOS DE RED E INTERNET',8,33),(376,'IMPLANTACIÓN DE APLICACIONES WEB',8,34),(377,'ADMINSTRACIÓN DE SISTEMAS GESTORES DE BASES',8,34),(378,'SEGURIDAD Y ALTA DISPONIBILIDAD',6,35);
 
--- Insert 1 admin named 'jolvary'
-INSERT INTO usuarios (nomUsuario, passUsuario, tlfUsuario, rolUsuario) VALUES
-('jolvary', 'password123', '+800000001', 'admin');
+INSERT INTO `unidades` VALUES (1,'Instalación de sistemas operativos',369,1,20),(2,'Configuración del software de base',369,2,10),(3,'Copias de seguridad y sistemas tolerantes a f',369,3,10),(4,'Centralización de la información en servidore',369,4,5),(5,'Administración de acceso a dominios',369,5,5),(6,'Detección problemas de rendimiento',369,6,10),(7,'Auditoría de la utilización y acceso a los re',369,7,10),(8,'Implantación de software específico',369,8,10),(9,'Planificación de redes',370,1,14),(10,'Instalación de redes',370,2,14),(11,'Configuración de redes',370,3,14),(12,'Mantenimiento de redes',370,4,14),(13,'Gestión de la seguridad en redes',370,5,14),(14,'Gestión de la calidad en redes',370,6,14),(15,'Gestión de la documentación técnica',370,7,14),(16,'Instalación y configuración de equipos microi',371,1,17),(17,'Mantenimiento de equipos microinformáticos',371,2,17),(18,'Instalación y configuración de sistemas opera',371,3,17),(19,'Mantenimiento de sistemas operativos en clien',371,4,17),(20,'Instalación y configuración de aplicaciones i',371,5,17),(21,'Mantenimiento de aplicaciones informáticas',371,6,17),(22,'Instalación y configuración de sistemas gesto',372,1,20),(23,'Mantenimiento de sistemas gestores de bases d',372,2,20),(24,'Gestión de la seguridad en bases de datos',372,3,20),(25,'Gestión de la calidad en bases de datos',372,4,20),(26,'Gestión de la documentación técnica en bases ',372,5,20),(27,'Creación y gestión de páginas web estáticas',373,1,20),(28,'Creación y gestión de páginas web dinámicas',373,2,20),(29,'Creación y gestión de aplicaciones web',373,3,20),(30,'Gestión del servidor web',373,4,20),(31,'Gestión del servidor de aplicaciones',373,5,20),(32,'Instalación y configuración de sistemas gesto',377,1,25),(33,'Mantenimiento de sistemas gestores de bases d',377,2,25),(34,'Gestión del rendimiento en sistemas gestores ',377,3,25),(35,'Gestión del servidor web para sistemas gestor',377,4,25),(36,'Planificación y gestión del sistema informáti',378,1,20),(37,'Implantación y mantenimiento del sistema info',378,2,20),(38,'Gestión de la seguridad del sistema informáti',378,3,20),(39,'Gestión de la calidad del sistema informático',378,4,20),(40,'Gestión de la documentación técnica del siste',378,5,20);
 
-INSERT INTO asignaturas (idAsignatura, nomAsignatura, horasSemana, idProfesor) VALUES
-(0369, 'IMPLANTACIÓN DE SISTEMAS OPERATIVOS', 12, 1),
-(0370, 'PLANIFICACIÓN Y ADMINISTRACIÓN DE REDES', 8, 2),
-(0371, 'FUNDAMENTOS DE HARDWARE', 6, 3),
-(0372, 'GESTIÓN DE BASES DE DATOS', 8, 4),
-(0373, 'LENGUAJES DE MARCAS Y SISTEMAS DE GESTIÓN DE INFORMACIÓN', 8, 4),
-(0374, 'ADMINISTRACIÓN DE SISTEMAS OPERATIVOS', 12, 1),
-(0375, 'SERVICIOS DE RED E INTERNET', 8, 2),
-(0376, 'IMPLANTACIÓN DE APLICACIONES WEB', 8, 4),
-(0377, 'ADMINSTRACIÓN DE SISTEMAS GESTORES DE BASES DE DATOS', 8, 4),
-(0378, 'SEGURIDAD Y ALTA DISPONIBILIDAD', 6, 3);
+INSERT INTO `instrumentos` VALUES (1,'Se han identificado los elementos funcionales',1,1),(2,'Se han identificado las características, func',1,2),(3,'Se han comparado diferentes sistemas operativ',1,2),(4,'Se han realizado instalaciones de diferentes ',1,4),(5,'Se han previsto y aplicado técnicas de actual',1,4),(6,'Se han solucionado incidencias del sistema y ',1,4),(7,'Se han utilizado herramientas para conocer el',1,2),(8,'Se ha elaborado documentación de soporte rela',1,3),(9,'Se han planificado, creado y configurado cuen',2,2),(10,'Se ha asegurado el acceso al sistema mediante',2,2),(11,'Se ha actuado sobre los servicios y procesos ',2,1),(12,'Se han instalado, configurado y verificado pr',2,1),(13,'Se han analizado y configurado los diferentes',2,1),(14,'Se ha optimizado el uso de los sistemas opera',2,1),(15,'Se han utilizado máquinas virtuales para real',2,1),(16,'Se han documentado las tareas de configuració',2,1),(17,'Se han comparado diversos sistemas de archivo',3,1),(18,'Se ha descrito la estructura de directorios d',3,1),(19,'Se han identificado los directorios contenedo',3,1),(20,'Se han utilizado herramientas de administraci',3,2),(21,'Se han implantado sistemas de almacenamiento ',3,1),(22,'Se han implementado y automatizado planes de ',3,2),(23,'Se han administrado cuotas de disco.',3,1),(24,'Se han documentado las operaciones realizadas',3,1),(25,'Se han implementado dominios.',4,1),(26,'Se han administrado cuentas de usuario y cuen',4,1),(27,'Se ha centralizado la información personal de',4,1),(28,'Se han creado y administrado grupos de seguri',4,1),(29,'Se han creado plantillas que faciliten la adm',4,1),(30,'Se han organizado los objetos del dominio par',4,1),(31,'Se han utilizado máquinas virtuales para admi',4,1),(32,'Se ha documentado la estructura del dominio y',4,1),(33,'Se han incorporado equipos al dominio.',5,1),(34,'Se han previsto bloqueos de accesos no autori',5,1),(35,'Se ha administrado el acceso a recursos local',5,1),(36,'Se han tenido en cuenta los requerimientos de',5,1),(37,'Se han implementado y verificado directivas d',5,1),(38,'Se han asignado directivas de grupo.',5,1),(39,'Se han documentado las tareas y las incidenci',5,1),(40,'Se han identificado los objetos monitorizable',6,1),(41,'Se han identificado los tipos de sucesos.',6,1),(42,'Se han utilizado herramientas de monitorizaci',6,2),(43,'Se ha monitorizado el rendimiento mediante re',6,2),(44,'Se han planificado y configurado alertas de r',6,1),(45,'Se han interpretado los registros de rendimie',6,1),(46,'Se ha analizado el sistema mediante técnicas ',6,1),(47,'Se ha elaborado documentación de soporte y de',6,1),(48,'Se han administrado derechos de usuario y dir',7,2),(49,'Se han identificado los objetos y sucesos aud',7,1),(50,'Se ha elaborado un plan de auditorías.',7,1),(51,'Se han identificado las repercusiones de las ',7,1),(52,'Se han auditado sucesos correctos y erróneos.',7,1),(53,'Se han auditado los intentos de acceso y los ',7,2),(54,'Se han gestionado los registros de auditoría.',7,2),(55,'Se ha documentado el proceso de auditoría y s',7,2),(56,'Se han administrado derechos de usuario y dir',8,2),(57,'Se han identificado los objetos y sucesos aud',8,1),(58,'Se ha elaborado un plan de auditorías.',8,1),(59,'Se han identificado las repercusiones de las ',8,1),(60,'Se han auditado sucesos correctos y erróneos.',8,1),(61,'Se han auditado los intentos de acceso y los ',8,2),(62,'Se han gestionado los registros de auditoría.',8,1),(63,'Se ha documentado el proceso de auditoría y s',8,1),(64,'Instrumento Unidad 1 - 1',1,1),(65,'Instrumento Unidad 1 - 2',1,1),(66,'Instrumento Unidad 1 - 3',1,1),(67,'Instrumento Unidad 1 - 4',1,1),(68,'Instrumento Unidad 1 - 5',1,1),(69,'Instrumento Unidad 1 - 6',1,1),(70,'Instrumento Unidad 1 - 7',1,1),(71,'Instrumento Unidad 1 - 8',1,1),(72,'Instrumento Unidad 2 - 1',2,1),(73,'Instrumento Unidad 2 - 2',2,1),(74,'Instrumento Unidad 2 - 3',2,1),(75,'Instrumento Unidad 2 - 4',2,1),(76,'Instrumento Unidad 2 - 5',2,1),(77,'Instrumento Unidad 2 - 6',2,1),(78,'Instrumento Unidad 2 - 7',2,1),(79,'Instrumento Unidad 2 - 8',2,1),(80,'Instrumento Unidad 3 - 1',3,1),(81,'Instrumento Unidad 3 - 2',3,1),(82,'Instrumento Unidad 3 - 3',3,1),(83,'Instrumento Unidad 3 - 4',3,1),(84,'Instrumento Unidad 3 - 5',3,1),(85,'Instrumento Unidad 3 - 6',3,1),(86,'Instrumento Unidad 3 - 7',3,1),(87,'Instrumento Unidad 3 - 8',3,1),(88,'Instrumento Unidad 4 - 1',4,1),(89,'Instrumento Unidad 4 - 2',4,1),(90,'Instrumento Unidad 4 - 3',4,1),(91,'Instrumento Unidad 4 - 4',4,1),(92,'Instrumento Unidad 4 - 5',4,1),(93,'Instrumento Unidad 4 - 6',4,1),(94,'Instrumento Unidad 4 - 7',4,1),(95,'Instrumento Unidad 4 - 8',4,1),(96,'Instrumento Unidad 5 - 1',5,1),(97,'Instrumento Unidad 5 - 2',5,1),(98,'Instrumento Unidad 5 - 3',5,1),(99,'Instrumento Unidad 5 - 4',5,1),(100,'Instrumento Unidad 5 - 5',5,1),(101,'Instrumento Unidad 5 - 6',5,1),(102,'Instrumento Unidad 5 - 7',5,1),(103,'Instrumento Unidad 5 - 8',5,1),(104,'Instrumento Unidad 6 - 1',6,1),(105,'Instrumento Unidad 6 - 2',6,1),(106,'Instrumento Unidad 6 - 3',6,1),(107,'Instrumento Unidad 6 - 4',6,1),(108,'Instrumento Unidad 6 - 5',6,1),(109,'Instrumento Unidad 6 - 6',6,1),(110,'Instrumento Unidad 6 - 7',6,1),(111,'Instrumento Unidad 6 - 8',6,1),(112,'Instrumento Unidad 7 - 1',7,1),(113,'Instrumento Unidad 7 - 2',7,1),(114,'Instrumento Unidad 7 - 3',7,1),(115,'Instrumento Unidad 7 - 4',7,1),(116,'Instrumento Unidad 7 - 5',7,1),(117,'Instrumento Unidad 7 - 6',7,1),(118,'Instrumento Unidad 7 - 7',7,1),(119,'Instrumento Unidad 7 - 8',7,1),(120,'Instrumento Unidad 8 - 1',8,1),(121,'Instrumento Unidad 8 - 2',8,1),(122,'Instrumento Unidad 8 - 3',8,1),(123,'Instrumento Unidad 8 - 4',8,1),(124,'Instrumento Unidad 8 - 5',8,1),(125,'Instrumento Unidad 8 - 6',8,1),(126,'Instrumento Unidad 8 - 7',8,1),(127,'Instrumento Unidad 8 - 8',8,1),(128,'Instrumento Unidad 9 - 1',9,1),(129,'Instrumento Unidad 9 - 2',9,1),(130,'Instrumento Unidad 9 - 3',9,1),(131,'Instrumento Unidad 9 - 4',9,1),(132,'Instrumento Unidad 9 - 5',9,1),(133,'Instrumento Unidad 9 - 6',9,1),(134,'Instrumento Unidad 9 - 7',9,1),(135,'Instrumento Unidad 9 - 8',9,1),(136,'Instrumento Unidad 10 - 1',10,1),(137,'Instrumento Unidad 10 - 2',10,1),(138,'Instrumento Unidad 10 - 3',10,1),(139,'Instrumento Unidad 10 - 4',10,1),(140,'Instrumento Unidad 10 - 5',10,1),(141,'Instrumento Unidad 10 - 6',10,1),(142,'Instrumento Unidad 10 - 7',10,1),(143,'Instrumento Unidad 10 - 8',10,1),(144,'Instrumento Unidad 11 - 1',11,1),(145,'Instrumento Unidad 11 - 2',11,1),(146,'Instrumento Unidad 11 - 3',11,1),(147,'Instrumento Unidad 11 - 4',11,1),(148,'Instrumento Unidad 11 - 5',11,1),(149,'Instrumento Unidad 11 - 6',11,1),(150,'Instrumento Unidad 11 - 7',11,1),(151,'Instrumento Unidad 11 - 8',11,1),(152,'Instrumento Unidad 12 - 1',12,1),(153,'Instrumento Unidad 12 - 2',12,1),(154,'Instrumento Unidad 12 - 3',12,1),(155,'Instrumento Unidad 12 - 4',12,1),(156,'Instrumento Unidad 12 - 5',12,1),(157,'Instrumento Unidad 12 - 6',12,1),(158,'Instrumento Unidad 12 - 7',12,1),(159,'Instrumento Unidad 12 - 8',12,1),(160,'Instrumento Unidad 13 - 1',13,1),(161,'Instrumento Unidad 13 - 2',13,1),(162,'Instrumento Unidad 13 - 3',13,1),(163,'Instrumento Unidad 13 - 4',13,1),(164,'Instrumento Unidad 13 - 5',13,1),(165,'Instrumento Unidad 13 - 6',13,1),(166,'Instrumento Unidad 13 - 7',13,1),(167,'Instrumento Unidad 13 - 8',13,1),(168,'Instrumento Unidad 14 - 1',14,1),(169,'Instrumento Unidad 14 - 2',14,1),(170,'Instrumento Unidad 14 - 3',14,1),(171,'Instrumento Unidad 14 - 4',14,1),(172,'Instrumento Unidad 14 - 5',14,1),(173,'Instrumento Unidad 14 - 6',14,1),(174,'Instrumento Unidad 14 - 7',14,1),(175,'Instrumento Unidad 14 - 8',14,1),(176,'Instrumento Unidad 15 - 1',15,1),(177,'Instrumento Unidad 15 - 2',15,1),(178,'Instrumento Unidad 15 - 3',15,1),(179,'Instrumento Unidad 15 - 4',15,1),(180,'Instrumento Unidad 15 - 5',15,1),(181,'Instrumento Unidad 15 - 6',15,1),(182,'Instrumento Unidad 15 - 7',15,1),(183,'Instrumento Unidad 15 - 8',15,1),(184,'Instrumento Unidad 16 - 1',16,1),(185,'Instrumento Unidad 16 - 2',16,1),(186,'Instrumento Unidad 16 - 3',16,1),(187,'Instrumento Unidad 16 - 4',16,1),(188,'Instrumento Unidad 16 - 5',16,1),(189,'Instrumento Unidad 16 - 6',16,1),(190,'Instrumento Unidad 16 - 7',16,1),(191,'Instrumento Unidad 16 - 8',16,1),(192,'Instrumento Unidad 17 - 1',17,1),(193,'Instrumento Unidad 17 - 2',17,1),(194,'Instrumento Unidad 17 - 3',17,1),(195,'Instrumento Unidad 17 - 4',17,1),(196,'Instrumento Unidad 17 - 5',17,1),(197,'Instrumento Unidad 17 - 6',17,1),(198,'Instrumento Unidad 17 - 7',17,1),(199,'Instrumento Unidad 17 - 8',17,1),(200,'Instrumento Unidad 18 - 1',18,1),(201,'Instrumento Unidad 18 - 2',18,1),(202,'Instrumento Unidad 18 - 3',18,1),(203,'Instrumento Unidad 18 - 4',18,1),(204,'Instrumento Unidad 18 - 5',18,1),(205,'Instrumento Unidad 18 - 6',18,1),(206,'Instrumento Unidad 18 - 7',18,1),(207,'Instrumento Unidad 18 - 8',18,1),(208,'Instrumento Unidad 19 - 1',19,1),(209,'Instrumento Unidad 19 - 2',19,1),(210,'Instrumento Unidad 19 - 3',19,1),(211,'Instrumento Unidad 19 - 4',19,1),(212,'Instrumento Unidad 19 - 5',19,1),(213,'Instrumento Unidad 19 - 6',19,1),(214,'Instrumento Unidad 19 - 7',19,1),(215,'Instrumento Unidad 19 - 8',19,1),(216,'Instrumento Unidad 20 - 1',20,1),(217,'Instrumento Unidad 20 - 2',20,1),(218,'Instrumento Unidad 20 - 3',20,1),(219,'Instrumento Unidad 20 - 4',20,1),(220,'Instrumento Unidad 20 - 5',20,1),(221,'Instrumento Unidad 20 - 6',20,1),(222,'Instrumento Unidad 20 - 7',20,1),(223,'Instrumento Unidad 20 - 8',20,1),(224,'Instrumento Unidad 21 - 1',21,1),(225,'Instrumento Unidad 21 - 2',21,1),(226,'Instrumento Unidad 21 - 3',21,1),(227,'Instrumento Unidad 21 - 4',21,1),(228,'Instrumento Unidad 21 - 5',21,1),(229,'Instrumento Unidad 21 - 6',21,1),(230,'Instrumento Unidad 21 - 7',21,1),(231,'Instrumento Unidad 21 - 8',21,1),(232,'Instrumento Unidad 22 - 1',22,1),(233,'Instrumento Unidad 22 - 2',22,1),(234,'Instrumento Unidad 22 - 3',22,1),(235,'Instrumento Unidad 22 - 4',22,1),(236,'Instrumento Unidad 22 - 5',22,1),(237,'Instrumento Unidad 22 - 6',22,1),(238,'Instrumento Unidad 22 - 7',22,1),(239,'Instrumento Unidad 22 - 8',22,1),(240,'Instrumento Unidad 23 - 1',23,1),(241,'Instrumento Unidad 23 - 2',23,1),(242,'Instrumento Unidad 23 - 3',23,1),(243,'Instrumento Unidad 23 - 4',23,1),(244,'Instrumento Unidad 23 - 5',23,1),(245,'Instrumento Unidad 23 - 6',23,1),(246,'Instrumento Unidad 23 - 7',23,1),(247,'Instrumento Unidad 23 - 8',23,1),(248,'Instrumento Unidad 24 - 1',24,1),(249,'Instrumento Unidad 24 - 2',24,1),(250,'Instrumento Unidad 24 - 3',24,1),(251,'Instrumento Unidad 24 - 4',24,1),(252,'Instrumento Unidad 24 - 5',24,1),(253,'Instrumento Unidad 24 - 6',24,1),(254,'Instrumento Unidad 24 - 7',24,1),(255,'Instrumento Unidad 24 - 8',24,1),(256,'Instrumento Unidad 25 - 1',25,1),(257,'Instrumento Unidad 25 - 2',25,1),(258,'Instrumento Unidad 25 - 3',25,1),(259,'Instrumento Unidad 25 - 4',25,1),(260,'Instrumento Unidad 25 - 5',25,1),(261,'Instrumento Unidad 25 - 6',25,1),(262,'Instrumento Unidad 25 - 7',25,1),(263,'Instrumento Unidad 25 - 8',25,1),(264,'Instrumento Unidad 26 - 1',26,1),(265,'Instrumento Unidad 26 - 2',26,1),(266,'Instrumento Unidad 26 - 3',26,1),(267,'Instrumento Unidad 26 - 4',26,1),(268,'Instrumento Unidad 26 - 5',26,1),(269,'Instrumento Unidad 26 - 6',26,1),(270,'Instrumento Unidad 26 - 7',26,1),(271,'Instrumento Unidad 26 - 8',26,1),(272,'Instrumento Unidad 27 - 1',27,1),(273,'Instrumento Unidad 27 - 2',27,1),(274,'Instrumento Unidad 27 - 3',27,1),(275,'Instrumento Unidad 27 - 4',27,1),(276,'Instrumento Unidad 27 - 5',27,1),(277,'Instrumento Unidad 27 - 6',27,1),(278,'Instrumento Unidad 27 - 7',27,1),(279,'Instrumento Unidad 27 - 8',27,1),(280,'Instrumento Unidad 28 - 1',28,1),(281,'Instrumento Unidad 28 - 2',28,1),(282,'Instrumento Unidad 28 - 3',28,1),(283,'Instrumento Unidad 28 - 4',28,1),(284,'Instrumento Unidad 28 - 5',28,1),(285,'Instrumento Unidad 28 - 6',28,1),(286,'Instrumento Unidad 28 - 7',28,1),(287,'Instrumento Unidad 28 - 8',28,1),(288,'Instrumento Unidad 29 - 1',29,1),(289,'Instrumento Unidad 29 - 2',29,1),(290,'Instrumento Unidad 29 - 3',29,1),(291,'Instrumento Unidad 29 - 4',29,1),(292,'Instrumento Unidad 29 - 5',29,1),(293,'Instrumento Unidad 29 - 6',29,1),(294,'Instrumento Unidad 29 - 7',29,1),(295,'Instrumento Unidad 29 - 8',29,1),(296,'Instrumento Unidad 30 - 1',30,1),(297,'Instrumento Unidad 30 - 2',30,1),(298,'Instrumento Unidad 30 - 3',30,1),(299,'Instrumento Unidad 30 - 4',30,1),(300,'Instrumento Unidad 30 - 5',30,1),(301,'Instrumento Unidad 30 - 6',30,1),(302,'Instrumento Unidad 30 - 7',30,1),(303,'Instrumento Unidad 30 - 8',30,1),(304,'Instrumento Unidad 31 - 1',31,1),(305,'Instrumento Unidad 31 - 2',31,1),(306,'Instrumento Unidad 31 - 3',31,1),(307,'Instrumento Unidad 31 - 4',31,1),(308,'Instrumento Unidad 31 - 5',31,1),(309,'Instrumento Unidad 31 - 6',31,1),(310,'Instrumento Unidad 31 - 7',31,1),(311,'Instrumento Unidad 31 - 8',31,1),(312,'Instrumento Unidad 32 - 1',32,1),(313,'Instrumento Unidad 32 - 2',32,1),(314,'Instrumento Unidad 32 - 3',32,1),(315,'Instrumento Unidad 32 - 4',32,1),(316,'Instrumento Unidad 32 - 5',32,1),(317,'Instrumento Unidad 32 - 6',32,1),(318,'Instrumento Unidad 32 - 7',32,1),(319,'Instrumento Unidad 32 - 8',32,1),(320,'Instrumento Unidad 33 - 1',33,1),(321,'Instrumento Unidad 33 - 2',33,1),(322,'Instrumento Unidad 33 - 3',33,1),(323,'Instrumento Unidad 33 - 4',33,1),(324,'Instrumento Unidad 33 - 5',33,1),(325,'Instrumento Unidad 33 - 6',33,1),(326,'Instrumento Unidad 33 - 7',33,1),(327,'Instrumento Unidad 33 - 8',33,1),(328,'Instrumento Unidad 34 - 1',34,1),(329,'Instrumento Unidad 34 - 2',34,1),(330,'Instrumento Unidad 34 - 3',34,1),(331,'Instrumento Unidad 34 - 4',34,1),(332,'Instrumento Unidad 34 - 5',34,1),(333,'Instrumento Unidad 34 - 6',34,1),(334,'Instrumento Unidad 34 - 7',34,1),(335,'Instrumento Unidad 34 - 8',34,1),(336,'Instrumento Unidad 35 - 1',35,1),(337,'Instrumento Unidad 35 - 2',35,1),(338,'Instrumento Unidad 35 - 3',35,1),(339,'Instrumento Unidad 35 - 4',35,1),(340,'Instrumento Unidad 35 - 5',35,1),(341,'Instrumento Unidad 35 - 6',35,1),(342,'Instrumento Unidad 35 - 7',35,1),(343,'Instrumento Unidad 35 - 8',35,1),(344,'Instrumento Unidad 36 - 1',36,1),(345,'Instrumento Unidad 36 - 2',36,1),(346,'Instrumento Unidad 36 - 3',36,1),(347,'Instrumento Unidad 36 - 4',36,1),(348,'Instrumento Unidad 36 - 5',36,1),(349,'Instrumento Unidad 36 - 6',36,1),(350,'Instrumento Unidad 36 - 7',36,1),(351,'Instrumento Unidad 36 - 8',36,1),(352,'Instrumento Unidad 37 - 1',37,1),(353,'Instrumento Unidad 37 - 2',37,1),(354,'Instrumento Unidad 37 - 3',37,1),(355,'Instrumento Unidad 37 - 4',37,1),(356,'Instrumento Unidad 37 - 5',37,1),(357,'Instrumento Unidad 37 - 6',37,1),(358,'Instrumento Unidad 37 - 7',37,1),(359,'Instrumento Unidad 37 - 8',37,1),(360,'Instrumento Unidad 38 - 1',38,1),(361,'Instrumento Unidad 38 - 2',38,1),(362,'Instrumento Unidad 38 - 3',38,1),(363,'Instrumento Unidad 38 - 4',38,1),(364,'Instrumento Unidad 38 - 5',38,1),(365,'Instrumento Unidad 38 - 6',38,1),(366,'Instrumento Unidad 38 - 7',38,1),(367,'Instrumento Unidad 38 - 8',38,1),(368,'Instrumento Unidad 39 - 1',39,1),(369,'Instrumento Unidad 39 - 2',39,1),(370,'Instrumento Unidad 39 - 3',39,1),(371,'Instrumento Unidad 39 - 4',39,1),(372,'Instrumento Unidad 39 - 5',39,1),(373,'Instrumento Unidad 39 - 6',39,1),(374,'Instrumento Unidad 39 - 7',39,1),(375,'Instrumento Unidad 39 - 8',39,1),(376,'Instrumento Unidad 40 - 1',40,1),(377,'Instrumento Unidad 40 - 2',40,1),(378,'Instrumento Unidad 40 - 3',40,1),(379,'Instrumento Unidad 40 - 4',40,1),(380,'Instrumento Unidad 40 - 5',40,1),(381,'Instrumento Unidad 40 - 6',40,1),(382,'Instrumento Unidad 40 - 7',40,1),(383,'Instrumento Unidad 40 - 8',40,1);
 
-INSERT INTO unidades (idUnidad, numUnidad, pesoUnidad, nomUnidad, idAsignatura) VALUES
-(1, 1, 20, 'Instalación de sistemas operativos', 0369),
-(2, 2, 10,'Configuración del software de base', 0369),
-(3, 3, 10,'Copias de seguridad y sistemas tolerantes a fallos', 0369),
-(4, 4, 5,'Centralización de la información en servidores', 0369),
-(5, 5, 5, 'Administración de acceso a dominios', 0369),
-(6, 6, 10, 'Detección problemas de rendimiento', 0369),
-(7, 7, 10, 'Auditoría de la utilización y acceso a los recursos', 0369),
-(8, 8, 10, 'Implantación de software específico', 0369),
-
-(9, 1, 14.29, 'Planificación de redes', 0370),
-(10, 2, 14.29, 'Instalación de redes', 0370),
-(11, 3, 14.29, 'Configuración de redes', 0370),
-(12, 4, 14.29, 'Mantenimiento de redes', 0370),
-(13, 5, 14.29, 'Gestión de la seguridad en redes', 0370),
-(14, 6, 14.29, 'Gestión de la calidad en redes', 0370),
-(15, 7, 14.29, 'Gestión de la documentación técnica', 0370),
-
-(16, 1, 16.67, 'Instalación y configuración de equipos microinformáticos', 0371),
-(17, 2, 16.67, 'Mantenimiento de equipos microinformáticos', 0371),
-(18, 3, 16.67, 'Instalación y configuración de sistemas operativos en clientes', 0371),
-(19, 4, 16.67, 'Mantenimiento de sistemas operativos en clientes', 0371),
-(20, 5, 16.67, 'Instalación y configuración de aplicaciones informáticas', 0371),
-(21, 6, 16.67, 'Mantenimiento de aplicaciones informáticas', 0371),
-
-(22, 1, 20, 'Instalación y configuración de sistemas gestores de bases de datos', 0372),
-(23, 2, 20, 'Mantenimiento de sistemas gestores de bases de datos', 0372),
-(24, 3, 20, 'Gestión de la seguridad en bases de datos', 0372),
-(25, 4, 20, 'Gestión de la calidad en bases de datos', 0372),
-(26, 5, 20, 'Gestión de la documentación técnica en bases de datos', 0372),
-
-(27, 1, 20, 'Creación y gestión de páginas web estáticas', 0373),
-(28, 2, 20, 'Creación y gestión de páginas web dinámicas', 0373),
-(29, 3, 20, 'Creación y gestión de aplicaciones web', 0373),
-(30, 4, 20, 'Gestión del servidor web', 0373),
-(31, 5, 20, 'Gestión del servidor de aplicaciones', 0373),
-
-(32, 1, 25, 'Instalación y configuración de sistemas gestores de bases de datos orientados a objetos', 0377),
-(33, 2, 25, 'Mantenimiento de sistemas gestores de bases de datos orientados a objetos', 0377),
-(34, 3, 25, 'Gestión del rendimiento en sistemas gestores de bases de datos orientados a objetos', 0377),
-(35, 4, 25, 'Gestión del servidor web para sistemas gestores de bases de datos orientados a objetos', 0377),
-
-(36, 1, 20, 'Planificación y gestión del sistema informático', 0378),
-(37, 2, 20, 'Implantación y mantenimiento del sistema informático', 0378),
-(38, 3, 20, 'Gestión de la seguridad del sistema informático', 0378),
-(39, 4, 20, 'Gestión de la calidad del sistema informático', 0378),
-(40, 5, 20, 'Gestión de la documentación técnica del sistema informático', 0378);
-
-INSERT INTO instrumentos (idInstrumento, nomInstrumento, idUnidad, pesoInstrumento) VALUES
-(1, 'Se han identificado los elementos funcionales de un sistema informático.', 1, 1),
-(2, 'Se han identificado las características, funciones y arquitectura de un sistema operativo.', 1, 1.5),
-(3, 'Se han comparado diferentes sistemas operativos, sus versiones y licencias de uso, en función de sus requisitos, características y campos de aplicación.', 1, 2),
-(4, 'Se han realizado instalaciones de diferentes sistemas operativos.', 1, 4),
-(5, 'Se han previsto y aplicado técnicas de actualización y recuperación del sistema.', 1, 3.5),
-(6, 'Se han solucionado incidencias del sistema y del proceso de inicio.', 1, 3.5),
-(7, 'Se han utilizado herramientas para conocer el software instalado en el sistema y su origen.', 1, 2),
-(8, 'Se ha elaborado documentación de soporte relativa a las instalaciones efectuadas y a las incidencias detectadas.', 1, 2.5),
-
-(9, 'Se han planificado, creado y configurado cuentas de usuario, grupos, perfiles y políticas de contraseñas locales.', 2, 2),
-(10, 'Se ha asegurado el acceso al sistema mediante el uso de directivas de cuenta y directivas de contraseñas.', 2, 2),
-(11, 'Se ha actuado sobre los servicios y procesos en función de las necesidades del sistema.', 2, 0.5),
-(12, 'Se han instalado, configurado y verificado protocolos de red.', 2, 1),
-(13, 'Se han analizado y configurado los diferentes métodos de resolución de nombres.', 2, 1),
-(14, 'Se ha optimizado el uso de los sistemas operativos para sistemas portátiles.', 2, 0.5),
-(15, 'Se han utilizado máquinas virtuales para realizar tareas de configuración de sistemas operativos y analizar sus resultados.', 2, 1),
-(16, 'Se han documentado las tareas de configuración del software de base.', 2, 1),
-
-(17, 'Se han comparado diversos sistemas de archivos y analizado sus diferencias y ventajas de implementación.', 3, 1),
-(18, 'Se ha descrito la estructura de directorios del sistema operativo.', 3, 1),
-(19, 'Se han identificado los directorios contenedores de los archivos de configuración del sistema (binarios, órdenes y librerías).', 3, 1),
-(20, 'Se han utilizado herramientas de administración de discos para crear particiones, unidades lógicas, volúmenes simples y volúmenes distribuidos.', 3, 2),
-(21, 'Se han implantado sistemas de almacenamiento redundante (RAID).', 3, 1),
-(22, 'Se han implementado y automatizado planes de copias de seguridad.', 3, 2),
-(23, 'Se han administrado cuotas de disco.', 3, 1),
-(24, 'Se han documentado las operaciones realizadas y los métodos a seguir para la recuperación ante desastres.', 3, 1),
-
-(25, 'Se han implementado dominios.', 4, 1),
-(26, 'Se han administrado cuentas de usuario y cuentas de equipo.', 4, 1),
-(27, 'Se ha centralizado la información personal de los usuarios del dominio mediante el uso de perfiles móviles y carpetas personales.', 4, 0.5),
-(28, 'Se han creado y administrado grupos de seguridad.', 4, 0.5),
-(29, 'Se han creado plantillas que faciliten la administración de usuarios con características similares.', 4, 0.5),
-(30, 'Se han organizado los objetos del dominio para facilitar su administración.', 4, 0.5),
-(31, 'Se han utilizado máquinas virtuales para administrar dominios y verificar su funcionamiento.', 4, 0.5),
-(32, 'Se ha documentado la estructura del dominio y las tareas realizadas.', 4, 0.5),
-
-(33, 'Se han incorporado equipos al dominio.', 5, 1),
-(34, 'Se han previsto bloqueos de accesos no autorizados al dominio.', 5, 0.5),
-(35, 'Se ha administrado el acceso a recursos locales y recursos de red.', 5, 1),
-(36, 'Se han tenido en cuenta los requerimientos de seguridad.', 5, 1),
-(37, 'Se han implementado y verificado directivas de grupo.', 5, 0.5),
-(38, 'Se han asignado directivas de grupo.', 5, 0.5),
-(39, 'Se han documentado las tareas y las incidencias.', 5, 0.5),
-
-(40, 'Se han identificado los objetos monitorizables en un sistema informático.', 6, 1),
-(41, 'Se han identificado los tipos de sucesos.', 6, 1),
-(42, 'Se han utilizado herramientas de monitorización en tiempo real.', 6, 2),
-(43, 'Se ha monitorizado el rendimiento mediante registros de contador y de seguimiento del sistema.', 6, 2),
-(44, 'Se han planificado y configurado alertas de rendimiento.', 6, 1),
-(45, 'Se han interpretado los registros de rendimiento almacenados.', 6, 1),
-(46, 'Se ha analizado el sistema mediante técnicas de simulación para optimizar el rendimiento.', 6, 1),
-(47, 'Se ha elaborado documentación de soporte y de incidencias.', 6, 1),
-
-(48, 'Se han administrado derechos de usuario y directivas de seguridad.', 7, 2),
-(49, 'Se han identificado los objetos y sucesos auditables.', 7, 1),
-(50, 'Se ha elaborado un plan de auditorías.', 7, 1),
-(51, 'Se han identificado las repercusiones de las auditorías en el rendimiento del sistema.', 7, 1),
-(52, 'Se han auditado sucesos correctos y erróneos.', 7, 1),
-(53, 'Se han auditado los intentos de acceso y los accesos a recursos del sistema.', 7, 2),
-(54, 'Se han gestionado los registros de auditoría.', 7, 2),
-(55, 'Se ha documentado el proceso de auditoría y sus resultados.', 7, 2),
-
-(56, 'Se han administrado derechos de usuario y directivas de seguridad.', 8, 2),
-(57, 'Se han identificado los objetos y sucesos auditables.', 8, 1),
-(58, 'Se ha elaborado un plan de auditorías.', 8, 1),
-(59, 'Se han identificado las repercusiones de las auditorías en el rendimiento del sistema.', 8, 1),
-(60, 'Se han auditado sucesos correctos y erróneos.', 8, 1),
-(61, 'Se han auditado los intentos de acceso y los accesos a recursos del sistema.', 8, 2),
-(62, 'Se han gestionado los registros de auditoría.', 8, 1),
-(63, 'Se ha documentado el proceso de auditoría y sus resultados.', 8, 1);
-
-INSERT INTO calificaciones (idInstrumento, idUsuario, calificacion) VALUES
-(1, 1, 8.5),
-(2, 1, 9.0),
-(3, 1, 7.5),
-(4, 1, 6.0),
-(5, 1, 8.0),
-(6, 1, 9.5),
-(7, 1, 10.0),
-(8, 1, 7.0),
-(9, 1, 8.0),
-(10, 1, 9.0),
-(11, 1, 6.5),
-(12, 1, 7.5),
-(13, 1, 8.5),
-(14, 1, 9.0),
-(15, 1, 10.0),
-(16, 1, 7.0),
-(17, 1, 8.0),
-(18, 1, 9.5),
-(19, 1, 6.0),
-(20, 1, 7.5),
-(21, 1, 8.5),
-(22, 1, 9.0),
-(23, 1, 10.0),
-(24, 1, 7.0),
-(25, 1, 8.0),
-(26, 1, 9.5),
-(27, 1, 6.0),
-(28, 1, 7.5),
-(29, 1, 8.5),
-(30, 1, 9.0),
-(31, 1, 10.0),
-(32, 1, 7.0),
-(33, 1, 8.0),
-(34, 1, 9.5),
-(35, 1, 6.0),
-(36, 1, 7.5),
-(37, 1, 8.5),
-(38, 1, 9.0),
-(39, 1, 10.0),
-(40, 1, 7.0),
-(41, 1, 8.0),
-(42, 1, 9.5),
-(43, 1, 6.0),
-(44, 1, 7.5),
-(45, 1, 8.5),
-(46, 1, 9.0),
-(47, 1, 10.0),
-(48, 1, 7.0),
-(49, 1, 8.0),
-(50, 1, 9.5),
-(51, 1, 6.0),
-(52, 1, 7.5),
-(53, 1, 8.5),
-(54, 1, 9.0),
-(55, 1, 10.0),
-(56, 1, 7.0),
-(57, 1, 8.0),
-(58, 1, 9.5),
-(59, 1, 6.0),
-(60, 1, 7.5),
-(61, 1, 8.5),
-(62, 1, 9.0),
-(63, 1, 10.0),
-(64, 2, 8.5),
-(65, 2, 9.0),
-(66, 2, 7.5),
-(67, 2, 6.0),
-(68, 2, 8.0),
-(69, 2, 9.5),
-(70, 2, 10.0),
-(71, 2, 7.0),
-(72, 2, 8.0),
-(73, 2, 9.0),
-(74, 2, 6.5),
-(75, 2, 7.5),
-(76, 2, 8.5),
-(77, 2, 9.0),
-(78, 2, 10.0),
-(79, 2, 7.0),
-(80, 2, 8.0),
-(81, 2, 9.5),
-(82, 2, 6.0),
-(83, 2, 7.5),
-(84, 2, 8.5),
-(85, 2, 9.0),
-(86, 2, 10.0),
-(87, 2, 7.0),
-(88, 2, 8.0),
-(89, 2, 9.5),
-(90, 2, 6.0),
-(91, 2, 7.5),
-(92, 2, 8.5),
-(93, 2, 9.0),
-(94, 2, 10.0),
-(95, 2, 7.0),
-(96, 2, 8.0),
-(97, 2, 9.5),
-(98, 2, 6.0),
-(99, 2, 7.5),
-(100, 2, 8.5),
-(101, 2, 9.0),
-(102, 2, 10.0),
-(103, 2, 7.0),
-(104, 2, 8.0),
-(105, 2, 9.5),
-(106, 2, 6.0),
-(107, 2, 7.5),
-(108, 2, 8.5),
-(109, 2, 9.0),
-(110, 2, 10.0),
-(111, 2, 7.0),
-(112, 2, 8.0),
-(113, 2, 9.5),
-(114, 2, 6.0),
-(115, 2, 7.5),
-(116, 2, 8.5),
-(117, 2, 9.0),
-(118, 2, 10.0),
-(119, 2, 7.0),
-(120, 2, 8.0),
-(121, 2, 9.5),
-(122, 2, 6.0),
-(123, 2, 7.5),
-(124, 2, 8.5),
-(125, 2, 9.0),
-(126, 2, 10.0),
-(127, 3, 4.0),
-(128, 3, 3.5),
-(129, 3, 2.5),
-(130, 3, 1.0),
-(131, 3, 4.5),
-(132, 3, 3.0),
-(133, 3, 2.0),
-(134, 3, 4.0),
-(135, 3, 3.5),
-(136, 3, 2.0),
-(137, 3, 1.5),
-(138, 3, 2.5),
-(139, 3, 3.0),
-(140, 3, 4.0),
-(141, 3, 4.5),
-(142, 3, 2.0),
-(143, 3, 3.5),
-(144, 3, 4.0),
-(145, 3, 3.0),
-(146, 3, 1.5),
-(147, 3, 2.5),
-(148, 3, 3.5),
-(149, 3, 4.0),
-(150, 3, 4.5),
-(151, 3, 3.0),
-(152, 3, 2.0),
-(153, 3, 1.5),
-(154, 3, 3.5),
-(155, 3, 4.0),
-(156, 3, 3.5),
-(157, 3, 2.5),
-(158, 3, 4.0),
-(159, 3, 4.5),
-(160, 3, 3.0),
-(161, 3, 2.0),
-(162, 3, 3.5),
-(163, 3, 4.0),
-(164, 3, 2.5),
-(165, 3, 3.0),
-(166, 3, 4.0),
-(167, 3, 3.5),
-(168, 3, 4.5),
-(169, 3, 2.0),
-(170, 3, 3.0),
-(171, 3, 4.0),
-(172, 3, 3.5),
-(173, 3, 2.5),
-(174, 3, 4.0),
-(175, 3, 3.0),
-(176, 3, 4.5),
-(177, 3, 2.0),
-(178, 3, 3.5),
-(179, 3, 4.0),
-(180, 3, 3.0),
-(181, 3, 2.5),
-(182, 3, 4.0),
-(183, 3, 3.5),
-(184, 3, 4.5),
-(185, 3, 2.0),
-(186, 3, 3.0),
-(187, 3, 4.0),
-(188, 3, 3.5),
-(189, 3, 2.5);
+INSERT INTO `calificaciones` VALUES (1,1,1,8.50),(2,2,1,9.00),(3,3,1,7.50),(4,4,1,6.00),(5,5,1,8.00),(6,6,1,9.50),(7,7,1,10.00),(8,8,1,7.00),(9,9,1,8.00),(10,10,1,9.00),(11,11,1,6.50),(12,12,1,7.50),(13,13,1,8.50),(14,14,1,9.00),(15,15,1,10.00),(16,16,1,7.00),(17,17,1,8.00),(18,18,1,9.50),(19,19,1,6.00),(20,20,1,7.50),(21,21,1,8.50),(22,22,1,9.00),(23,23,1,10.00),(24,24,1,7.00),(25,25,1,8.00),(26,26,1,9.50),(27,27,1,6.00),(28,28,1,7.50),(29,29,1,8.50),(30,30,1,9.00),(31,31,1,10.00),(32,32,1,7.00),(33,33,1,8.00),(34,34,1,9.50),(35,35,1,6.00),(36,36,1,7.50),(37,37,1,8.50),(38,38,1,9.00),(39,39,1,10.00),(40,40,1,7.00),(41,41,1,8.00),(42,42,1,9.50),(43,43,1,6.00),(44,44,1,7.50),(45,45,1,8.50),(46,46,1,9.00),(47,47,1,10.00),(48,48,1,7.00),(49,49,1,8.00),(50,50,1,9.50),(51,51,1,6.00),(52,52,1,7.50),(53,53,1,8.50),(54,54,1,9.00),(55,55,1,10.00),(56,56,1,7.00),(57,57,1,8.00),(58,58,1,9.50),(59,59,1,6.00),(60,60,1,7.50),(61,61,1,8.50),(62,62,1,9.00),(63,63,1,10.00),(64,1,3,4.00),(65,2,3,3.50),(66,3,3,2.50),(67,4,3,1.00),(68,5,3,4.50),(69,6,3,3.00),(70,7,3,2.00),(71,8,3,4.00),(72,9,3,3.50),(73,10,3,2.00),(74,11,3,1.50),(75,12,3,2.50),(76,13,3,3.00),(77,14,3,4.00),(78,15,3,4.50),(79,16,3,2.00),(80,17,3,3.50),(81,18,3,4.00),(82,19,3,3.00),(83,20,3,1.50),(84,21,3,2.50),(85,22,3,3.50),(86,23,3,4.00),(87,24,3,4.50),(88,25,3,3.00),(89,26,3,2.00),(90,27,3,1.50),(91,28,3,3.50),(92,29,3,4.00),(93,30,3,3.50),(94,31,3,2.50),(95,32,3,4.00),(96,33,3,4.50),(97,34,3,3.00),(98,35,3,2.00),(99,36,3,3.50),(100,37,3,4.00),(101,38,3,2.50),(102,39,3,3.00),(103,40,3,4.00),(104,41,3,3.50),(105,42,3,4.50),(106,43,3,2.00),(107,44,3,3.00),(108,45,3,4.00),(109,46,3,3.50),(110,47,3,2.50),(111,48,3,4.00),(112,49,3,3.00),(113,50,3,4.50),(114,51,3,2.00),(115,52,3,3.50),(116,53,3,4.00),(117,54,3,3.00),(118,55,3,2.50),(119,56,3,4.00),(120,57,3,3.50),(121,58,3,4.50),(122,59,3,2.00),(123,60,3,3.00),(124,61,3,4.00),(125,62,3,3.50),(126,63,3,2.50),(127,1,2,9.10),(128,2,2,8.70),(129,3,2,6.80),(130,4,2,1.50),(131,5,2,2.90),(132,6,2,3.40),(133,7,2,1.20),(134,8,2,9.10),(135,9,2,3.10),(136,10,2,0.60),(137,11,2,0.60),(138,12,2,9.70),(139,13,2,8.10),(140,14,2,0.90),(141,15,2,8.50),(142,16,2,9.80),(143,17,2,0.10),(144,18,2,5.40),(145,19,2,2.00),(146,20,2,3.20),(147,21,2,7.90),(148,22,2,8.70),(149,23,2,7.70),(150,24,2,8.20),(151,25,2,9.60),(152,26,2,0.10),(153,27,2,0.60),(154,28,2,6.60),(155,29,2,2.90),(156,30,2,3.70),(157,31,2,4.80),(158,32,2,3.00),(159,33,2,2.10),(160,34,2,2.20),(161,35,2,3.50),(162,36,2,5.70),(163,37,2,1.80),(164,38,2,4.00),(165,39,2,0.30),(166,40,2,5.00),(167,41,2,5.70),(168,42,2,7.80),(169,43,2,9.60),(170,44,2,0.30),(171,45,2,2.90),(172,46,2,4.80),(173,47,2,5.40),(174,48,2,9.20),(175,49,2,9.30),(176,50,2,9.70),(177,51,2,3.10),(178,52,2,0.00),(179,53,2,10.00),(180,54,2,7.70),(181,55,2,1.30),(182,56,2,9.00),(183,57,2,9.00),(184,58,2,5.90),(185,59,2,6.60),(186,60,2,3.30),(187,61,2,4.30),(188,62,2,2.60),(189,63,2,7.60),(220,288,40,10.00),(221,296,40,9.50),(222,304,40,9.00),(223,1,40,8.70),(224,9,40,9.20),(225,17,40,7.80),(226,128,40,8.90),(227,136,40,9.30),(228,144,40,7.60),(229,184,40,8.50),(230,192,40,8.70),(231,200,40,9.00),(232,232,40,9.10),(233,240,40,8.40),(234,248,40,8.90),(235,272,40,9.50),(236,280,40,8.20),(237,288,40,9.40),(238,312,40,9.00),(239,320,40,9.20),(240,328,40,8.70),(241,344,40,8.80),(242,352,40,9.10),(243,360,40,8.90),(244,2,5,9.00),(245,10,5,8.50),(246,18,5,7.50),(247,128,5,8.90),(248,136,5,9.10),(249,144,5,8.00),(250,184,5,9.20),(251,192,5,8.60),(252,200,5,8.40),(253,232,5,8.70),(254,240,5,9.30),(255,248,5,8.10),(256,272,5,9.00),(257,280,5,9.20),(258,288,5,8.80),(259,312,5,8.90),(260,320,5,9.00),(261,328,5,8.40),(262,344,5,8.70),(263,352,5,9.10),(264,360,5,9.00),(265,3,6,8.00),(266,11,6,7.50),(267,19,6,9.00),(268,129,6,8.40),(269,137,6,9.20),(270,145,6,8.70),(271,185,6,9.10),(272,193,6,8.80),(273,201,6,9.00),(274,233,6,8.30),(275,241,6,9.00),(276,249,6,8.60),(277,273,6,8.90),(278,281,6,9.40),(279,289,6,8.70),(280,313,6,9.10),(281,321,6,8.60),(282,329,6,9.30),(283,345,6,8.90),(284,353,6,9.50),(285,361,6,9.20),(286,4,7,8.20),(287,12,7,8.70),(288,20,7,8.50),(289,130,7,9.00),(290,138,7,8.50),(291,146,7,9.20),(292,186,7,8.40),(293,194,7,9.10),(294,202,7,8.90),(295,234,7,8.80),(296,242,7,9.00),(297,250,7,8.70),(298,274,7,8.60),(299,282,7,9.30),(300,290,7,8.50),(301,314,7,9.40),(302,322,7,9.10),(303,330,7,8.60),(304,346,7,8.90),(305,354,7,9.20),(306,362,7,8.80);
