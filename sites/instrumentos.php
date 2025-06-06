@@ -5,48 +5,52 @@
     require_once '../config/funciones.php';
     require_once '../config/db.php';
     
-    //DBCreation();
-    $asig = $_GET['asignatura'];
+    session_start();
 
-    $sql = ("SELECT nombre FROM Notas.asignaturas where codigo='$asig'");
-    $nombre = $conn->query($sql);
-    $code = mysqli_fetch_row($nombre);
-	$nasignatura = $code[0];
+    if (!isset($_SESSION['idUsuario'])) {
+        header("Location: ../users/login.php");
+        exit();
+    }
 
-    if (!empty($_POST)) {
-        procesarCambiosInstrumentos($_POST);
-    };
+    $idUser = $_SESSION['idUsuario'];
+    $rolUser = $_SESSION['rolUsuario'];
+    var_dump($_GET);
+    $unidad = $_GET['idUnidad'];
 
-    error_reporting(E_ALL ^ E_NOTICE);
-    error_reporting(E_ALL ^ E_WARNING); 
+    $sql = ("SELECT U.nomUnidad, U.idUnidad, U.idAsignatura, A.nomAsignatura FROM notas.unidades AS U
+            INNER JOIN notas.asignaturas AS A ON U.idAsignatura = A.idAsignatura where idUnidad='$unidad'");
+    $result = $conn->query($sql);
+    $row = $result -> fetch_assoc();
+	$nomUnidad = $row['nomUnidad'];
+    $nomAsignatura = $row['nomAsignatura'];
+    
     ?>
 
-<HEAD>
+<head>
+    <meta charset="UTF-8">
+    <title>Instrumentos</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
 
-    <TITLE>Instrumentos</TITLE>
+<div class="container mt-5 text-center">
+    <a href="../sites/unidades.php" class="btn btn-link mb-4">← Volver</a>
 
-</HEAD>
+    <h1 class="mb-4">Instrumentos de Evaluación</h1>
 
-<BODY>
-    <center>
-    <h2><a href="../index.php"><div style="float: left">Volver</div></a>
-    <div align="center"><?php echo 'Asignatura ', $asig, " : ", $nasignatura;?></div></h2>
+    <form method="post">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered mx-auto">
+                <?php displayInstrumentos($unidad, $idUser, $rolUser); ?>
+            </table>
+        </div>
 
-    <h1 style="text-align:center;"><img src='../iconos/smile.png'> INSTRUMENTOS </h1>
-    <FORM METHOD=POST ACTION="">
-        <TABLE>
-			<TR><TH>Unidad</TH><TH>Nombre del Instrumento</TH><TH>Peso (%)</TH><TH>Calificación</TH></TR>
-		    <?php 
-                //var_dump($_GET);
-                //var_dump($_POST);
-                deleteInstrumento($asig);
-                displayInstrumentos($asig);               
-            ?>
-        </TABLE><br/>
-		<INPUT TYPE="submit" name="procesar" value="Guardar Cambios">
-		<INPUT TYPE="submit" name="procesar" value="Descartar Cambios">            
-    </FORM>
-    </center>
-</BODY>
+        <?php if ($rolUser === "admin"): ?>
+            <button type="submit" name="procesar" value="Guardar" class="btn btn-primary">Guardar Cambios</button>
+            <button type="submit" name="procesar" value="Descartar" class="btn btn-secondary ml-2">Descartar Cambios</button>
+        <?php endif; ?>
+    </form>
+</div>
 
-</HTML>
+</body>
+</html>

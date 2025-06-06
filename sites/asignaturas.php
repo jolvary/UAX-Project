@@ -2,10 +2,8 @@
 
     <?php
     
-    include('../config/funciones.php');
+    require_once '../config/funciones.php';
     require_once '../config/db.php';
-   
-    error_reporting(E_ALL ^ E_NOTICE);
 
     session_start();
 
@@ -23,22 +21,23 @@
 
     <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
     <TITLE>RA5</TITLE>
-    <link rel="stylesheet" href="https://jolvary.com/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
 
 </HEAD>
 
 <BODY>
     <center>
-    <br><br><br><br><br><br><br><br><h2>ASIGNATURAS</h2>
+    <br><br><br><br><br><br><br><h2>ASIGNATURAS</h2>
     <FORM METHOD=POST ACTION="">
         <TABLE>
             <?php 
                 echo "<br>";
-                displayAsignaturas(40, 'admin');
+                procesarCambiosAsignatura();
+                displayAsignaturas($idUser, $rolUser);
             ?>
         </TABLE><br/>
         <?php
-            if ($rolUser == 'alumno') {
+            if ($rolUser !== 'admin') {
                 return;
             } else {
                 echo "<INPUT TYPE='submit' name='procesar' value='Guardar Cambios'>";

@@ -8,10 +8,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE usuarios (
     idUsuario INT NOT NULL AUTO_INCREMENT,
-    nomUsuario VARCHAR(45) NOT NULL,
-    passUsuario VARCHAR(45) NOT NULL,
+    nomUsuario VARCHAR(100) NOT NULL,
+    passUsuario VARCHAR(100) NOT NULL,
     tlfUsuario VARCHAR(12) NOT NULL,
-    rolUsuario VARCHAR(45) DEFAULT 'alumno',
+    rolUsuario VARCHAR(100) DEFAULT 'alumno',
     PRIMARY KEY (idUsuario),
     UNIQUE KEY nomUsuario_UNIQUE (tlfUsuario),
     CONSTRAINT CHK_Rol CHECK (rolUsuario IN ('admin', 'profesor', 'alumno'))
@@ -19,7 +19,7 @@ CREATE TABLE usuarios (
 
 CREATE TABLE profesores (
     idProfesor INT NOT NULL,
-    nomProfesor VARCHAR(45) NOT NULL,
+    nomProfesor VARCHAR(100) NOT NULL,
     tlfProfesor VARCHAR(12) NOT NULL,
     PRIMARY KEY (idProfesor),
     UNIQUE KEY nomProfesor_UNIQUE (tlfProfesor)
@@ -27,30 +27,34 @@ CREATE TABLE profesores (
 
 CREATE TABLE asignaturas (
     idAsignatura INT NOT NULL,
-    nomAsignatura VARCHAR(45) NOT NULL,
+    nomAsignatura VARCHAR(100) NOT NULL,
     horasSemana INT NOT NULL,
-    idProfesor INT NOT NULL,
+    idProfesor INT,
     PRIMARY KEY (idAsignatura),
-    FOREIGN KEY (idProfesor) REFERENCES profesores(idProfesor) ON DELETE CASCADE
-);
+    FOREIGN KEY (idProfesor) REFERENCES profesores(idProfesor) 
+    ON DELETE SET NULL);
 
 CREATE TABLE unidades (
-    idUnidad INT NOT NULL,
-    nomUnidad VARCHAR(45) NOT NULL,
+    idUnidad INT NOT NULL AUTO_INCREMENT,
+    nomUnidad VARCHAR(100) NOT NULL,
     idAsignatura INT NOT NULL,
     numUnidad INT NOT NULL,
     pesoUnidad INT NOT NULL,
     PRIMARY KEY (idUnidad),
-    FOREIGN KEY (idAsignatura) REFERENCES asignaturas(idAsignatura) ON DELETE CASCADE
+    FOREIGN KEY (idAsignatura) REFERENCES asignaturas(idAsignatura) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE instrumentos (
     idInstrumento INT NOT NULL AUTO_INCREMENT,
-    nomInstrumento VARCHAR(45) NOT NULL,
+    nomInstrumento VARCHAR(100) NOT NULL,
     idUnidad INT NOT NULL,
     pesoInstrumento INT NOT NULL,
     PRIMARY KEY (idInstrumento),
-    FOREIGN KEY (idUnidad) REFERENCES unidades(idUnidad) ON DELETE CASCADE
+    FOREIGN KEY (idUnidad) REFERENCES unidades(idUnidad) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE calificaciones (
@@ -59,13 +63,15 @@ CREATE TABLE calificaciones (
     idUsuario INT NOT NULL,
     calificacion DECIMAL(5,2) NOT NULL,
     PRIMARY KEY (idCalificacion),
-    FOREIGN KEY (idInstrumento) REFERENCES instrumentos(idInstrumento) ON DELETE CASCADE, 
+    FOREIGN KEY (idInstrumento) REFERENCES instrumentos(idInstrumento) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE, 
     FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
 );
 
 USE notas;
 
-CREATE PROCEDURE sp_sync_profesor(IN p_idUsuario INT, IN p_nomUsuario VARCHAR(45), IN p_tlfUsuario VARCHAR(12))
+CREATE PROCEDURE sp_sync_profesor(IN p_idUsuario INT, IN p_nomUsuario VARCHAR(100), IN p_tlfUsuario VARCHAR(12))
 BEGIN
     DECLARE v_profesor_id INT;
     SELECT idProfesor INTO v_profesor_id

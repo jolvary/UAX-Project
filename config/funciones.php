@@ -3,19 +3,13 @@
 require_once __DIR__ . '/db.php';
 global $conn;
 
-
 function displayAsignaturas($idUser, $rolUser) {
-
-    $idUser = 40;
-    $rolUser = "alumno";
-
-    var_dump($idUser, $rolUser);
 
     global $conn;
 
 	if ($rolUser == "admin") {
 
-        $sql = "SELECT A.idAsignatura, A.nomAsignatura, A.horasSemana, P.nomProfesor FROM notas.asignaturas AS A 
+        $sql = "SELECT A.idAsignatura, A.nomAsignatura, A.horasSemana, P.idProfesor FROM notas.asignaturas AS A 
             INNER JOIN notas.profesores AS P ON A.idProfesor = P.idProfesor
             GROUP BY A.idAsignatura";
 
@@ -32,18 +26,16 @@ function displayAsignaturas($idUser, $rolUser) {
             echo "        <TH class='text-center'>PROFESOR</TH>";
             echo "</TR>";
 
-            while ($fila = mysqli_fetch_row($result)) {
+            while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <INPUT TYPE='hidden' name='codigo[$cont]' value='$fila[0]'>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='newCodigo[$cont]' value='$fila[0]' size='3'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='nombre[$cont]' value='$fila[1]' size='50'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='2'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='profesor[$cont]' value='$fila[3]' size='44'></TD>";
-                echo "    <TD><a href='index.php?operacion=eliminar&asignatura=$fila[0]'><img src='../iconos/remove32.png'></a></TD>";
-                echo "    <TD><a href='../sites/unidades.php?asignatura=$fila[0]'><img src='../iconos/tarta.png'></a></TD>";
-                echo "    <TD><a href='/sites/instrumentos.php?asignatura=$fila[0]'><img src='../iconos/smile.png'></a></TD>";
-                echo "    <TD><a href='/sites/expediente.php'><img src='../iconos/birrete.png'></a></TD>";
+                echo "    <INPUT TYPE='hidden' name='idAsig[$cont]' value='$row[idAsignatura]'>";
+                echo "    <TD class='text-center'><INPUT TYPE='text' name='idAsignatura[$cont]' value='$row[idAsignatura]' size='3'></TD>";
+                echo "    <TD class='text-center'><INPUT TYPE='text' name='nomAsignatura[$cont]' value='$row[nomAsignatura]' size='50'></TD>";
+                echo "    <TD class='text-center'><INPUT TYPE='text' name='horasSemana[$cont]' value='$row[horasSemana]' size='2'></TD>";
+                echo "    <TD class='text-center'><INPUT TYPE='text' name='idProfesor[$cont]' value='$row[idProfesor]' size='44'></TD>";
+                echo "    <TD><a href='asignaturas.php?operacion=eliminar&idAsignatura=$row[idAsignatura]'><img src='../iconos/remove32.png'></a></TD>";
+                echo "    <TD><a href='../sites/unidades.php?idAsignatura=$row[idAsignatura]'><img src='../iconos/tarta.png'></a></TD>";
                 echo "</TR>";
                 
                 $cont++;
@@ -51,13 +43,11 @@ function displayAsignaturas($idUser, $rolUser) {
             }
 
             echo "<TR>";
-            echo "    <TD class='text-center'><INPUT TYPE='text' name='addCodigo' size='3'></TD>";
+            echo "    <TD class='text-center'><INPUT TYPE='text' name='addAsig' size='3'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addNombre' size='50'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addHoras' size='2'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addProfesor' size='44'></TD>";
             echo "</TR>";
-
-            procesarCambiosAsignatura();
 
         } else {
 
@@ -83,35 +73,21 @@ function displayAsignaturas($idUser, $rolUser) {
             echo "        <TH class='text-center'>CÓDIGO</TH>";
             echo "        <TH class='text-center'>NOMBRE</TH>";
             echo "        <TH class='text-center'>HORAS</TH>";
-            echo "        <TH class='text-center'>PROFESOR</TH>";
             echo "</TR>";
 
-            while ($fila = mysqli_fetch_row($result)) {
+            while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <INPUT TYPE='hidden' name='codigo[$cont]' value='$fila[0]'>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='newCodigo[$cont]' value='$fila[0]' size='3'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='nombre[$cont]' value='$fila[1]' size='50'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='2'></TD>";
-                echo "    <TD class='text-center'><INPUT TYPE='text' name='profesor[$cont]' value='$fila[3]' size='44'></TD>";
-                echo "    <TD><a href='/sites/unidades.php?asignatura=$fila[0]'><img src='../iconos/tarta.png'></a></TD>";
-                echo "    <TD><a href='/sites/instrumentos.php?asignatura=$fila[0]'><img src='../iconos/smile.png'></a></TD>";
-                echo "    <TD><a href='/sites/expediente.php'><img src='../iconos/birrete.png'></a></TD>";
+                echo "    <INPUT TYPE='hidden' name='idAsig[$cont]' value='$row[idAsignatura]'>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='idAsignatura[$cont]' value='$row[idAsignatura]' size='3'></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='nomAsignatura[$cont]' value='$row[nomAsignatura]' size='50'></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='horasSemana[$cont]' value='$row[horasSemana]' size='2'></TD>";
+                echo "    <TD><a href='/sites/unidades.php?idAsignatura=$row[idAsignatura]'><img src='../iconos/tarta.png'></a></TD>";
                 echo "</TR>";
 
                 $cont++;
 
             }
-
-            echo "<TR>";
-            echo "    <TD class='text-center'><INPUT TYPE='text' name='addCodigo' size='3'></TD>";
-            echo "    <TD class='text-center'><INPUT TYPE='text' name='addNombre' size='50'></TD>";
-            echo "    <TD class='text-center'><INPUT TYPE='text' name='addHoras' size='2'></TD>";
-            echo "    <TD class='text-center'><INPUT TYPE='text' name='addProfesor' size='44'></TD>";
-            echo "</TR>";
-
-            procesarCambiosAsignatura();
-            
 
         }  else {
 
@@ -143,17 +119,15 @@ function displayAsignaturas($idUser, $rolUser) {
             echo "        <TH class='text-center'>PROFESOR</TH>";
             echo "</TR>";
 
-            while ($fila = mysqli_fetch_row($result)) {
+            while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <INPUT TYPE='hidden' name='codigo[$cont]' value='$fila[0]'>";
-                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='newCodigo[$cont]' value='$fila[0]' size='3'></TD>";
-                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='nombre[$cont]' value='$fila[1]' size='50'></TD>";
-                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='horas_semana[$cont]' value='$fila[2]' size='2'></TD>";
-                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='profesor[$cont]' value='$fila[3]' size='44'></TD>";
-                echo "    <TD><a href='/sites/unidades.php?asignatura=$fila[0]'><img src='../iconos/tarta.png'></a></TD>";
-                echo "    <TD><a href='/sites/instrumentos.php?asignatura=$fila[0]'><img src='../iconos/smile.png'></a></TD>";
-                echo "    <TD><a href='/sites/expediente.php'><img src='../iconos/birrete.png'></a></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='idAsignatura[$cont]' value='$row[idAsignatura]' size='3'></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='nomAsignatura[$cont]' value='$row[nomAsignatura]' size='50'></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='horasSemana[$cont]' value='$row[horasSemana]' size='2'></TD>";
+                echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='nomProfesor[$cont]' value='$row[nomProfesor]' size='44'></TD>";
+                echo "    <TD><a href='/sites/unidades.php?idAsignatura=$row[idAsignatura]'><img src='../iconos/tarta.png'></a></TD>";
+                echo "    <TD><a href='../sites/calificaciones.php'><img src='../iconos/birrete.png'></a></TD>";
                 echo "</TR>";
 
                 $cont++;
@@ -176,49 +150,49 @@ function procesarCambiosAsignatura() {
 
     global $conn;
 
-    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
+    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar"&&!$_POST['procesar']=="Guardar Cambios") {
 
-
-        $codigo = $_GET['asignatura'];
-        $sql = "DELETE FROM notas.asignaturas where codigo=$codigo";
+        $idAsig = $_GET['idAsignatura'];
+        $sql = "DELETE FROM notas.asignaturas where idAsignatura=$idAsig";
         $conn->query($sql);
         
     }
 
-    if(isset($_POST['addCodigo'])&&$_POST['addCodigo']!="") {
+    if(isset($_POST['procesar'])&&$_POST['procesar']== "Guardar Cambios") {
 
-     	$ncodigo = $_POST["addCodigo"];
-        $nnombre = $_POST["addNombre"];
-        $nhoras = $_POST["addHoras"];
-        $nprofesor = $_POST["addProfesor"];
-	    $sql = "INSERT INTO notas.asignaturas VALUES ( '$ncodigo','$nnombre', '$nhoras', '$nprofesor' )";
-	    $conn->query( $sql );
+        if (isset($_POST['addAsig']) && $_POST['addAsig'] != "") {
+            $nuidAsignatura = $_POST["addAsig"];
+            $nunomAsignatura = $_POST["addNombre"];
+            $uhorasSemana = $_POST["addHoras"];
+            $nuidProfesor = $_POST["addProfesor"];
 
-    }
+            $sql = "INSERT INTO notas.asignaturas (idAsignatura, nomAsignatura, horasSemana, idProfesor) VALUES ('$nuidAsignatura', '$nunomAsignatura', '$uhorasSemana', '$nuidProfesor')";
+            $conn->query($sql);
+        }
 
-    if(isset($_POST['procesar'])&&$_POST['procesar']=="Guardar Cambios") {
+        $uidAsig = $_POST["idAsig"];
+        $uidAsignatura = $_POST["idAsignatura"];
+        $unomAsignatura = $_POST["nomAsignatura"];
+        $uhorasSemana = $_POST["horasSemana"];
+        $uidProf = $_POST["idProfesor"];
 
-        $ucodigo = $_POST["codigo"];
-        $unewCodigo = $_POST["newCodigo"];
-        $unombre = $_POST["nombre"];
-        $uhoras = $_POST["horas_semana"];
-        $uprofesor = $_POST["profesor"];
+        for($i=0; $i<count($_POST["idAsig"]); $i++) {
 
-        for($i=0; $i<count($_POST["codigo"]); $i++) {
-
-            updateAsignaturas ($ucodigo[$i], $unewCodigo[$i], $unombre[$i], $uhoras[$i], $uprofesor[$i] );
-
+            updateAsignaturas ($uidAsig[$i], $uidAsignatura[$i], $unomAsignatura[$i], $uhorasSemana[$i], $uidProf[$i]);
+        
         }
 
     }
 
+    $_POST = array();
+
 }
 
-function updateAsignaturas ($ucodigo, $unewCodigo, $unombre, $uhoras, $uprofesor) {
+function updateAsignaturas ($uidAsig, $uidAsignatura, $unomAsignatura, $uhorasSemana, $uidProf) {
 
     global $conn;
 
-	$sql = "UPDATE notas.asignaturas SET idAsignatura='$unewCodigo', nomAsignatura='$unombre', horasSemana='$uhoras', idProfesor='$uprofesor' WHERE idAsignatura='$ucodigo'";
+	$sql = "UPDATE notas.asignaturas SET idAsignatura='$uidAsignatura', nomAsignatura='$unomAsignatura', horasSemana='$uhorasSemana', idProfesor='$uidProf'  WHERE idAsignatura='$uidAsig'";
 	$conn->query( $sql );
 
 }
@@ -227,22 +201,20 @@ function updateAsignaturas ($ucodigo, $unewCodigo, $unombre, $uhoras, $uprofesor
 
 function displayUnidades($asignatura, $idUser, $rolUser) {
 
+    
     global $conn;
-
-    $idUser = 40;
-    $rolUser = "admin";
-
-    $sql = "SELECT * FROM notas.unidades where idAsignatura=$asignatura";
-    $result = $conn->query($sql);
 
     if ($rolUser == "admin") {
 
-        if ($result) {
+        $sql = "SELECT * FROM notas.unidades WHERE idAsignatura='$asignatura' ORDER BY numUnidad";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
 
             $cont=0;
 
             echo "<TR>";
-            echo "        <TH class='text-center'>NÚMERO</TH>";
+            echo "        <TH class='text-center'>UNIDAD</TH>";
             echo "        <TH class='text-center'>NOMBRE</TH>";
             echo "        <TH class='text-center'>PESO %</TH>";
             echo "</TR>";
@@ -250,10 +222,12 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
             while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <TD><INPUT TYPE='text' name='numero[$cont]' value=$row[numUnidad] size='3'></TD>";
-                echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='$row[nomUnidad]' size='60'></TD>";
-                echo "    <TD><INPUT TYPE='text' name='porcentaje[$cont]' value=$row[pesoUnidad] size='5'></TD>";
-                echo "    <TD><a href='../sites/unidades.php?asignatura=$asignatura&operacion=eliminar&unidad=$row[idUnidad]'><img src='../iconos/remove32.png'></a></TD>";
+                echo "    <INPUT TYPE='hidden' name='idUnidad[$cont]' value='$row[idUnidad]'>";
+                echo "    <TD><INPUT TYPE='text' name='numUnidad[$cont]' value=$row[numUnidad] size='3'></TD>";
+                echo "    <TD><INPUT TYPE='text' name='nomUnidad[$cont]' value='$row[nomUnidad]' size='60'></TD>";
+                echo "    <TD><INPUT TYPE='text' name='pesoUnidad[$cont]' value=$row[pesoUnidad] size='5'></TD>";
+                echo "    <TD><a href='../sites/unidades.php?idAsignatura=$asignatura&operacion=eliminar&idUnidad=$row[idUnidad]'><img src='../iconos/remove32.png'></a></TD>";
+                echo "    <TD><a href='../sites/instrumentos.php?idAsignatura=$asignatura&idUnidad=$row[idUnidad]'><img src='../iconos/smile.png'></a></TD>";
                 echo "</TR>";
                 
                 $cont++;
@@ -268,17 +242,19 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
 
             mysqli_free_result($result);
 
-            procesarCambiosUnidades($asignatura);
-
         }
+
     } else if ($rolUser == "profesor") {
 
+        $sql = "SELECT * FROM notas.unidades WHERE idAsignatura='$asignatura' ORDER BY numUnidad";
+        $result = $conn->query($sql);
+
         if ($result) {
 
             $cont=0;
 
-             echo "<TR>";
-            echo "        <TH class='text-center'>NÚMERO</TH>";
+            echo "<TR>";
+            echo "        <TH class='text-center'>UNIDAD</TH>";
             echo "        <TH class='text-center'>NOMBRE</TH>";
             echo "        <TH class='text-center'>PESO %</TH>";
             echo "</TR>";
@@ -286,83 +262,83 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
             while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <TD><INPUT TYPE='text' name='numero[$cont]' value=$row[numUnidad] size='3'></TD>";
-                echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='$row[nomUnidad]' size='60'></TD>";
-                echo "    <TD><INPUT TYPE='text' name='porcentaje[$cont]' value=$row[pesoUnidad] size='5'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='numUnidad[$cont]' value=$row[numUnidad] size='3'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='nomUnidad[$cont]' value='$row[nomUnidad]' size='60'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='pesoUnidad[$cont]' value=$row[pesoUnidad] size='5'></TD>";
+                echo "    <TD><a href='../sites/instrumentos.php?idUnidad=$row[idUnidad]'><img src='../iconos/smile.png'></a></TD>";
                 echo "</TR>";
                 
                 $cont++;
 
             }
 
-            echo "<TR>";
-            echo "    <TD><INPUT TYPE='text' name='addNumero' size='3'></TD>";
-            echo "    <TD><INPUT TYPE='text' name='addNombre' size='60'></TD>";
-            echo "    <TD><INPUT TYPE='text' name='addPorcentaje' size='5'></TD>";
-            echo "</TR>";
-
-            mysqli_free_result($result);
-
-            procesarCambiosUnidades($asignatura);
-
         }
-    } else if ($rolUser == "alumno") {
+
+    } else {
+
+        $sql = "SELECT * FROM notas.unidades WHERE idAsignatura='$asignatura' ORDER BY numUnidad";
+        $result = $conn->query($sql);
 
         if ($result) {
 
             $cont=0;
 
-            while ($fila = mysqli_fetch_row($result)) {
+            echo "<TR>";
+            echo "        <TH class='text-center'>UNIDAD</TH>";
+            echo "        <TH class='text-center'>NOMBRE</TH>";
+            echo "        <TH class='text-center'>PESO %</TH>";
+            echo "</TR>";
+
+            while ($row = $result -> fetch_assoc()) {
 
                 echo "<TR>";
-                echo "    <INPUT TYPE='hidden' name='clave[$cont]' value='$fila[0]'>";
-                echo "    <TD><INPUT readonly='readonly' TYPE='text' name='numero[$cont]' value='$fila[2]' size='3'></TD>";
-                echo "    <TD><INPUT readonly='readonly' TYPE='text' name='nombre[$cont]' value='$fila[3]' size='40'></TD>";
-                echo "    <TD><INPUT readonly='readonly' TYPE='text' name='porcentaje[$cont]' value='$fila[4]' size='5'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='numUnidad[$cont]' value=$row[numUnidad] size='3'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='nomUnidad[$cont]' value='$row[nomUnidad]' size='60'></TD>";
+                echo "    <TD><INPUT TYPE='text' readonly='readonly' name='pesoUnidad[$cont]' value=$row[pesoUnidad] size='5'></TD>";
+                echo "    <TD><a href='../sites/calificaciones.php?idUnidad=$row[idUnidad]'><img src='../iconos/birrete.png'></a></TD>";
                 echo "</TR>";
-
+                
                 $cont++;
 
             }
 
-            mysqli_free_result($result);
-
         }
+
     }
+
 }
 
-function procesarCambiosUnidades($asignatura) {
+function procesarCambiosUnidades() {
 
     global $conn;
 
-    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
+    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar" && !$_POST['procesar']=="Guardar Cambios") {
 
-        $unidad = $_GET['unidad'];
-	    $sql = "DELETE FROM notas.instrumentos WHERE unidad='$unidad'";
-	    $conn->query( $sql );
-        $sql2 = "DELETE FROM notas.unidades WHERE clave='$unidad'";
-        $conn->query( $sql2 );
+        $unidad = $_GET['idUnidad'];
+        $sql = "DELETE FROM notas.unidades WHERE idUnidad='$unidad'";
+        $conn->query( $sql );
 
     }
 
-    if(isset($_POST['addNumero'])&&$_POST['addNumero']!=""&&$_POST['procesar']=="Guardar Cambios") {
+    if(isset($_POST['procesar'])&&$_POST['procesar']== "Guardar Cambios") {
 
-     	$nnumero = $_POST["addNumero"];
-        $nnombre = $_POST["addNombre"];
-        $nporcentaje = $_POST["addPorcentaje"];
-	    $sql = "INSERT INTO notas.unidades ( asignatura, numero, nombre, porcentaje ) VALUES ( '$asignatura', '$nnumero','$nnombre', '$nporcentaje' )";
-	    $conn->query( $sql );   
+        if (isset($_POST['addNumero']) && $_POST['addNumero'] != "") {
 
-    }
+            $nnumero = $_POST["addNumero"];
+            $nnombre = $_POST["addNombre"];
+            $nporcentaje = $_POST["addPorcentaje"];
+            $asignatura = $_GET['idAsignatura'];
+            $sql = "INSERT INTO notas.unidades ( numUnidad, idAsignatura, nomUnidad, pesoUnidad ) VALUES ('$nnumero', '$asignatura', '$nnombre', '$nporcentaje' )";
+            $conn->query( $sql );   
 
-    if(isset($_POST['procesar'])&&$_POST['procesar']=="Guardar Cambios"&&isset($_POST["clave"])) {
+        }
 
-        $uclave = $_POST["clave"];
-        $unumero = $_POST["numero"];
-        $unombre = $_POST["nombre"];
-        $uporcentaje = $_POST["porcentaje"];
+        $uclave = $_POST["idUnidad"];
+        $unumero = $_POST["numUnidad"];
+        $unombre = $_POST["nomUnidad"];
+        $uporcentaje = $_POST["pesoUnidad"];
 
-        for($i=0; $i<count($_POST["clave"]); $i++) {
+        for($i=0; $i<count($_POST["idUnidad"]); $i++) {
 
             updateUnidades ($uclave[$i], $unumero[$i], $unombre[$i], $uporcentaje[$i]);
 
@@ -376,7 +352,7 @@ function updateUnidades ($uclave, $unumero, $unombre, $uporcentaje) {
 
     global $conn;
 
-	$sql = "UPDATE notas.unidades SET clave='$uclave', nombre='$unombre', numero='$unumero', porcentaje='$uporcentaje' WHERE clave='$uclave'";
+	$sql = "UPDATE notas.unidades SET nomUnidad='$unombre', numUnidad='$unumero', pesoUnidad='$uporcentaje' WHERE idUnidad='$uclave'";
 	$conn->query( $sql );
 
 }
@@ -384,106 +360,131 @@ function updateUnidades ($uclave, $unumero, $unombre, $uporcentaje) {
 // Instrumentos
 
 
-function displayInstrumentos($codigoAsignatura) {
-
+function displayInstrumentos($unidad, $idUser, $rolUser) {
     global $conn;
 
-    $consulta = "SELECT instrumentos.*, unidades.numero FROM `instrumentos` INNER JOIN unidades on unidades.clave= unidad WHERE unidades.asignatura = '$codigoAsignatura'";
+    if ($rolUser === "admin") {
+        $result = getInstrumentosPorUnidad($unidad);
 
-    if ($result = mysqli_query($conn, $consulta)) {
-        $cont=0;
-		foreach ($result as $fila) {
-            echo "<TR>";
-            echo "    <INPUT TYPE='hidden' name='clave[$cont]' value='" . $fila["clave"] . "'>";
-            dropdownUnidad($codigoAsignatura, $cont, $fila['unidad']);
-            echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='" . $fila["nombre"] . "' size='40'></TD>";
-            echo "    <TD><INPUT TYPE='number' name='peso[$cont]' value='" . $fila["peso"] . "' size='10'></TD>";
-            echo "    <TD><INPUT TYPE='text' name='calificacion[$cont]' value='" . $fila["calificacion"] . "' size='10'></TD>";
-	        echo "    <TD><a href='../sites/instrumentos.php?operacion=eliminar&clave=" . $fila["clave"] . "&asignatura=".$codigoAsignatura."'><img src='../iconos/remove32.png' title='eliminar'></a></TD>";
-            echo "</TR>";
-            $cont++;
-        }
-        echo "<TR>";
-            echo "    <INPUT TYPE='hidden' name='clave[$cont]' value=''>";
-            dropdownUnidad($codigoAsignatura, $cont, 0);
-            echo "    <TD><INPUT TYPE='text' name='nombre[$cont]' value='' size='40'></TD>";
-            echo "    <TD><INPUT TYPE='number' name='peso[$cont]' value='' size='10'></TD>";
-            echo "    <TD><INPUT TYPE='text' name='calificacion[$cont]' value='' size='10'></TD>";
-	        echo "    <TD></TD>";
-            echo "</TR>";
-		mysqli_free_result($result);
-    }
-}
+        if ($result->num_rows > 0) {
+            $cont = 0;
 
-function dropdownUnidad($codigoAsignatura, $cont, $activo) {
+            echo "<thead class='thead-dark'>";
+            echo "<tr class='text-center'>";
+            echo "    <th>Nombre del Instrumento</th>";
+            echo "    <th>Peso (%)</th>";
+            echo "    <th>Eliminar</th>";
+            echo "</tr>";
+            echo "</thead>";
+            echo "<tbody>";
 
-    global $conn;
-
-    $consulta = "SELECT clave, nombre FROM unidades WHERE asignatura = '$codigoAsignatura'";
-
-    echo "<TD><select name='unidad[$cont]'>";
-    echo "<option value=''></option>";
-    if ($result = mysqli_query($conn, $consulta)) {
-        foreach ($result as $fila) {
-            echo "<option value='".$fila['clave']."'";
-            if ($fila['clave'] == $activo) {
-                echo "selected='selected'";
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr class='text-center align-middle'>";
+                echo "    <input type='hidden' name='idInstrumento[$cont]' value='{$row['idInstrumento']}'>";
+                echo "    <td><input type='text' class='form-control' name='nomInstrumento[$cont]' value='" . htmlspecialchars($row['nomInstrumento']) . "' size='60'></td>";
+                echo "    <td><input type='text' class='form-control text-center' name='pesoInstrumento[$cont]' value='{$row['pesoInstrumento']}' size='5'></td>";
+                echo "    <td><a href='../sites/instrumentos.php?operacion=eliminar&idUnidad=$unidad&idInstrumento={$row['idInstrumento']}'><img src='../iconos/remove32.png' alt='Eliminar'></a></td>";
+                echo "</tr>";
+                $cont++;
             }
-            echo ">".$fila['nombre']."</option>";
+
+            // Extra row for adding a new instrument
+            echo "<tr class='text-center'>";
+            echo "    <td><input type='text' class='form-control' name='addNombre' size='60' placeholder='Nuevo instrumento'></td>";
+            echo "    <td><input type='text' class='form-control text-center' name='addPorcentaje' size='5' placeholder='%'></td>";
+            echo "    <td></td>";
+            echo "</tr>";
+            echo "</tbody>";
+        }
+
+    } else if ($rolUser === "profesor") {
+        $selectedInstrumento = isset($_POST['idInstrumento']) ? intval($_POST['idInstrumento']) : null;
+        $resultInstrumentos = getInstrumentosPorUnidad($unidad);
+        $calificaciones = [];
+
+        echo "<form method='post' class='mb-4'>";
+        echo "<div class='form-group'>";
+        echo "<label for='idInstrumento'>Selecciona un Instrumento</label>";
+        echo "<select class='form-control w-50 mx-auto' name='idInstrumento' id='idInstrumento' onchange='this.form.submit()'>";
+        echo "    <option value=''>-- Seleccione --</option>";
+
+        while ($row = $resultInstrumentos->fetch_assoc()) {
+            $selected = ($selectedInstrumento == $row['idInstrumento']) ? "selected" : "";
+            echo "<option value='{$row['idInstrumento']}' $selected>" . htmlspecialchars($row['nomInstrumento']) . "</option>";
+        }
+
+        echo "</select>";
+        echo "</div>";
+        echo "</form>";
+
+        if ($selectedInstrumento) {
+            $calificaciones = getCalificacionesPorInstrumento($selectedInstrumento);
+
+            if (count($calificaciones) > 0) {
+                echo "<table class='table table-bordered table-hover'>";
+                echo "<thead class='thead-dark'><tr class='text-center'>";
+                echo "    <th>Unidad</th>";
+                echo "    <th>Instrumento</th>";
+                echo "    <th>Usuario</th>";
+                echo "    <th>Calificación</th>";
+                echo "</tr></thead><tbody>";
+
+                foreach ($calificaciones as $cal) {
+                    echo "<tr class='text-center'>";
+                    echo "    <td>{$cal['numUnidad']}</td>";
+                    echo "    <td>" . htmlspecialchars($cal['nomInstrumento']) . "</td>";
+                    echo "    <td>" . htmlspecialchars($cal['nomUsuario']) . "</td>";
+                    echo "    <td>{$cal['calificacion']}</td>";
+                    echo "</tr>";
+                }
+
+                echo "</tbody></table>";
+            } else {
+                echo "<p class='text-center'>No hay calificaciones para este instrumento.</p>";
+            }
         }
     }
-    echo "</select></td>";
-}
+} 
 
-function procesarCambiosInstrumentos($datos) {
+function getInstrumentosPorUnidad($idUnidad) {
 
     global $conn;
 
-    if(!isset($datos["clave"])) {
-       return;
+    $stmt = $conn->prepare("SELECT idInstrumento, nomInstrumento FROM instrumentos WHERE idUnidad = ?");
+    $stmt->bind_param("i", $idUnidad);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getCalificacionesPorInstrumento($idInstrumento) {
+
+    global $conn;
+
+    $stmt = $conn->prepare("
+        SELECT 
+            Un.numUnidad, 
+            I.nomInstrumento, 
+            U.nomUsuario, 
+            C.calificacion 
+        FROM calificaciones AS C
+        INNER JOIN instrumentos AS I ON C.idInstrumento = I.idInstrumento
+        INNER JOIN usuarios AS U ON U.idUsuario = C.idUsuario
+        INNER JOIN unidades AS Un ON I.idUnidad = Un.idUnidad
+        WHERE I.idInstrumento = ?
+    ");
+    $stmt->bind_param("i", $idInstrumento);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $calificaciones = [];
+    while ($row = $result->fetch_assoc()) {
+        $calificaciones[] = $row;
     }
-    $claves = $datos["clave"];
-	$unidades = $datos["unidad"];
-	$nombres = $datos["nombre"];
-	$pesos = $datos["peso"];
-	$calificaciones = $datos["calificacion"];
-	for($i=0; $i<count($claves); $i++) {
-		updateInstrumento($claves[$i], $unidades[$i], $nombres[$i], $pesos[$i], $calificaciones[$i] );
-    }
-    newInstrumento($unidades[$i-1], $nombres[$i-1], $pesos[$i-1], $calificaciones[$i-1]);
+    return $calificaciones;
 }
 
-function deleteInstrumento() {
 
-    global $conn;
 
-    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar") {
-
-        $instrumento = $_GET['clave'];
-	    $sql = "DELETE FROM notas.instrumentos WHERE clave='$instrumento'";
-	    $conn->query( $sql );
-
-    }
-
-}
-
-function updateInstrumento ($clave, $unidad, $nombre, $peso, $calificacion) {
-	
-    global $conn;
-
-	$sql = "UPDATE instrumentos SET unidad='$unidad', nombre='$nombre', peso='$peso', calificacion='$calificacion' WHERE clave='$clave'";
-    $conn->query($sql);
-}
-
-function newInstrumento($unidad, $nombre, $peso, $calificacion) {
-
-    global $conn;
-
-    if(!empty($nombre)) {
-	    $sql = "INSERT INTO instrumentos (unidad, nombre, peso, calificacion) VALUES ( '$unidad','$nombre', '$peso', '$calificacion')";
-	    $conn->query($sql);   
-    }   
-}
 
 // EXPEDIENTES
 

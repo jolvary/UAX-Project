@@ -71,10 +71,10 @@ if (isset($_POST['login'])) {
     $telefono = $_SESSION['telefono'];
 
     [$idUser, $rolUser] = iniSesion($usuario, $contraseña, 'login');
-    $_SESSION['idUsuario'] = $idUser;
-    $_SESSION['rolUsuario'] = $rolUser;
+    $_SESSION['idUsuario'] = $idUser = 32;
+    $_SESSION['rolUsuario'] = $rolUser = 'profesor';
 
-    header("Location: https://jolvary.com/sites/asignaturas.php");
+    header("Location: ../sites/asignaturas.php");
 
     $service = $twilio->verify->v2->services->create(
         "My First Verify Service"
