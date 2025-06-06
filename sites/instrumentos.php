@@ -14,7 +14,7 @@
 
     $idUser = $_SESSION['idUsuario'];
     $rolUser = $_SESSION['rolUsuario'];
-    var_dump($_GET);
+    //var_dump($_GET);
     $unidad = $_GET['idUnidad'];
 
     $sql = ("SELECT U.nomUnidad, U.idUnidad, U.idAsignatura, A.nomAsignatura FROM notas.unidades AS U

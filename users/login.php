@@ -7,8 +7,8 @@ use Twilio\Rest\Client;
 global $twilioAccountSid, $twilioAuthToken, $conn;
 
 //error_reporting(E_ALL ^ E_NOTICE);
-var_dump("POST -> ", $_POST);
-var_dump("GET -> ", $_GET);
+//var_dump("POST -> ", $_POST);
+//var_dump("GET -> ", $_GET);
 
 
 session_start(); // For storing status messages
