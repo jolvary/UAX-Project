@@ -28,26 +28,30 @@
 
     <TITLE>Unidades</TITLE>
 
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
 </HEAD>
 
-<BODY>
+<body class="bg-light">
+
+<div class="container mt-5 text-center">
+    <?php echo "<a href='../sites/asignaturas.php'" ?> class="btn btn-link mb-4">← Volver</a><br><br><br><br><br><br>
     <center>
-    <h2><a href="./asignaturas.php"><div style="float: left">Volver</div></h2></a><br><br><br><br><br><br><br>
     <h1 style="text-align:center;"><img src='../iconos/tarta.png'> UNIDADES </h1><br>
     <h3><div align="center"><?php echo 'Asignatura ', $asig, " : ", $nasignatura;?></div></h3><br><br>
 
     
     <FORM METHOD=POST ACTION="">
-        <TABLE>
-		    <?php 
+        <div class="table-responsive">
+            <TABLE>
+                <?php 
 
-                procesarCambiosUnidades();
-                displayUnidades($asig, $idUser, $rolUser);
-                
-            ?>
-        </TABLE><br/>
+                    procesarCambiosUnidades();
+                    displayUnidades($asig, $idUser, $rolUser);
+                    
+                ?>
+            </TABLE><br/>
+        </div><br>
 		<?php
             if ($rolUser !== 'admin') {
                 return;
@@ -59,6 +63,7 @@
         ?>         
     </FORM>
     </center>
+</div>
 </BODY>
 
 </HTML>

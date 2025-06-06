@@ -19,22 +19,24 @@
 
 <HEAD>
 
-    <h2><a href="../index.php"><div style="float: left">Volver</div></a></h2>
     <TITLE>RA5</TITLE>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 </HEAD>
 
-<BODY>
+<body class="bg-light">
+
+<div class="container mt-5 text-center">
+    <a href='../users/login.php' class="btn btn-link mb-4">← Volver</a>
     <center>
     <br><br><br><br><br><br><br><h2>ASIGNATURAS</h2>
     <FORM METHOD=POST ACTION="">
-        <TABLE>
-            <?php 
+        <div class="table-responsive">
+            <table><?php 
                 echo "<br>";
                 procesarCambiosAsignatura();
                 displayAsignaturas($idUser, $rolUser);
-            ?>
+            ?></table>
         </TABLE><br/>
         <?php
             if ($rolUser !== 'admin') {
@@ -45,6 +47,7 @@
             }
             
         ?>
+        </div>
     </FORM>
     </center>
 </BODY>

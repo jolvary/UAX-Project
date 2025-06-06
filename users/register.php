@@ -108,7 +108,7 @@ if (isset($_POST['registro'])) {
 
                     crearUsuario($usuario, $contraseña, $telefono);
 
-                    header("Location: https://jolvary.com/users/login.php");
+                    header("Location: ./users/login.php");
                     exit();
                     
                 } else {
@@ -224,7 +224,7 @@ if (isset($_POST['registro'])) {
                                 >
                                     Registrarse
                                 </button>
-                                <a href="https://jolvary.com/users/login.php" class="btn btn-secondary">Iniciar sesión</a>
+                                <a href="./users/login.php" class="btn btn-secondary">Iniciar sesión</a>
                             </div>
                         </form>
                     </div>

@@ -19,12 +19,13 @@ function displayAsignaturas($idUser, $rolUser) {
 
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>CÓDIGO</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>HORAS</TH>";
-            echo "        <TH class='text-center'>PROFESOR</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>CÓDIGO</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>HORAS</TH>";
+            echo "        <TH>PROFESOR</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -41,14 +42,14 @@ function displayAsignaturas($idUser, $rolUser) {
                 $cont++;
 
             }
-
+            
             echo "<TR>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addAsig' size='3'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addNombre' size='50'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addHoras' size='2'></TD>";
             echo "    <TD class='text-center'><INPUT TYPE='text' name='addProfesor' size='44'></TD>";
             echo "</TR>";
-
+            echo "</tbody></table>";
         } else {
 
             echo "<TR><TD colspan=4>No hay asignaturas disponibles.</TD></TR>";
@@ -69,11 +70,12 @@ function displayAsignaturas($idUser, $rolUser) {
         
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>CÓDIGO</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>HORAS</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>CÓDIGO</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>HORAS</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -88,6 +90,7 @@ function displayAsignaturas($idUser, $rolUser) {
                 $cont++;
 
             }
+            echo "</tbody></table>";
 
         }  else {
 
@@ -112,12 +115,13 @@ function displayAsignaturas($idUser, $rolUser) {
             
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>CÓDIGO</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>HORAS</TH>";
-            echo "        <TH class='text-center'>PROFESOR</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>CÓDIGO</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>HORAS</TH>";
+            echo "        <TH>PROFESOR</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -127,12 +131,14 @@ function displayAsignaturas($idUser, $rolUser) {
                 echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='horasSemana[$cont]' value='$row[horasSemana]' size='2'></TD>";
                 echo "    <TD class='text-center'><INPUT readonly='readonly' TYPE='text' name='nomProfesor[$cont]' value='$row[nomProfesor]' size='44'></TD>";
                 echo "    <TD><a href='/sites/unidades.php?idAsignatura=$row[idAsignatura]'><img src='../iconos/tarta.png'></a></TD>";
-                echo "    <TD><a href='../sites/calificaciones.php'><img src='../iconos/birrete.png'></a></TD>";
+                echo "    <TD><a href='../sites/expediente.php'><img src='../iconos/birrete.png'></a></TD>";
                 echo "</TR>";
 
                 $cont++;
 
             }
+
+            echo "</tbody></table>";
 
         } else {
 
@@ -213,11 +219,12 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
 
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>UNIDAD</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>PESO %</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>UNIDAD</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>PESO %</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -240,6 +247,8 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
             echo "    <TD><INPUT TYPE='text' name='addPorcentaje' size='5'></TD>";
             echo "</TR>";
 
+            echo "</tbody></table>";
+
             mysqli_free_result($result);
 
         }
@@ -253,11 +262,12 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
 
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>UNIDAD</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>PESO %</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>UNIDAD</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>PESO %</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -272,6 +282,8 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
 
             }
 
+            echo "</tbody></table>";
+
         }
 
     } else {
@@ -283,11 +295,12 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
 
             $cont=0;
 
-            echo "<TR>";
-            echo "        <TH class='text-center'>UNIDAD</TH>";
-            echo "        <TH class='text-center'>NOMBRE</TH>";
-            echo "        <TH class='text-center'>PESO %</TH>";
-            echo "</TR>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>UNIDAD</TH>";
+            echo "        <TH>NOMBRE</TH>";
+            echo "        <TH>PESO %</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result -> fetch_assoc()) {
 
@@ -301,6 +314,8 @@ function displayUnidades($asignatura, $idUser, $rolUser) {
                 $cont++;
 
             }
+
+            echo "</tbody></table>";
 
         }
 
@@ -369,14 +384,11 @@ function displayInstrumentos($unidad, $idUser, $rolUser) {
         if ($result->num_rows > 0) {
             $cont = 0;
 
-            echo "<thead class='thead-dark'>";
-            echo "<tr class='text-center'>";
-            echo "    <th>Nombre del Instrumento</th>";
-            echo "    <th>Peso (%)</th>";
-            echo "    <th>Eliminar</th>";
-            echo "</tr>";
-            echo "</thead>";
-            echo "<tbody>";
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='thead-dark'><tr class='text-center'>";
+            echo "        <TH>UNIDAD</TH>";
+            echo "        <TH>PESO %</TH>";
+            echo "</tr></thead><tbody>";
 
             while ($row = $result->fetch_assoc()) {
                 echo "<tr class='text-center align-middle'>";
@@ -397,52 +409,56 @@ function displayInstrumentos($unidad, $idUser, $rolUser) {
             echo "</tbody>";
         }
 
+        echo "</table></tbody>";
+
     } else if ($rolUser === "profesor") {
-        $selectedInstrumento = isset($_POST['idInstrumento']) ? intval($_POST['idInstrumento']) : null;
-        $resultInstrumentos = getInstrumentosPorUnidad($unidad);
-        $calificaciones = [];
 
-        echo "<form method='post' class='mb-4'>";
-        echo "<div class='form-group'>";
-        echo "<label for='idInstrumento'>Selecciona un Instrumento</label>";
-        echo "<select class='form-control w-50 mx-auto' name='idInstrumento' id='idInstrumento' onchange='this.form.submit()'>";
-        echo "    <option value=''>-- Seleccione --</option>";
+    $selectedInstrumento = isset($_POST['idInstrumento']) ? intval($_POST['idInstrumento']) : null;
+    $resultInstrumentos = getInstrumentosPorUnidad($unidad);
+    $calificaciones = [];
 
-        while ($row = $resultInstrumentos->fetch_assoc()) {
-            $selected = ($selectedInstrumento == $row['idInstrumento']) ? "selected" : "";
-            echo "<option value='{$row['idInstrumento']}' $selected>" . htmlspecialchars($row['nomInstrumento']) . "</option>";
-        }
+    echo "<form method='post' style='margin-bottom: 20px; text-align: center;'>";
+    echo "<label for='idInstrumento'><strong>Selecciona un Instrumento:</strong></label><br>";
+    echo "<select name='idInstrumento' id='idInstrumento' onchange='this.form.submit()' style='padding: 5px; width: 250px; margin-top: 10px;'>";
+    echo "    <option value=''>-- Seleccione --</option>";
 
-        echo "</select>";
-        echo "</div>";
-        echo "</form>";
+    while ($row = $resultInstrumentos->fetch_assoc()) {
 
-        if ($selectedInstrumento) {
-            $calificaciones = getCalificacionesPorInstrumento($selectedInstrumento);
+        $selected = ($selectedInstrumento == $row['idInstrumento']) ? "selected" : "";
+        echo "<option value='{$row['idInstrumento']}' $selected>" . htmlspecialchars($row['nomInstrumento']) . "</option>";
+    }
 
-            if (count($calificaciones) > 0) {
-                echo "<table class='table table-bordered table-hover'>";
-                echo "<thead class='thead-dark'><tr class='text-center'>";
-                echo "    <th>Unidad</th>";
-                echo "    <th>Instrumento</th>";
-                echo "    <th>Usuario</th>";
-                echo "    <th>Calificación</th>";
-                echo "</tr></thead><tbody>";
+    echo "</select>";
+    echo "</form>";
 
-                foreach ($calificaciones as $cal) {
-                    echo "<tr class='text-center'>";
-                    echo "    <td>{$cal['numUnidad']}</td>";
-                    echo "    <td>" . htmlspecialchars($cal['nomInstrumento']) . "</td>";
-                    echo "    <td>" . htmlspecialchars($cal['nomUsuario']) . "</td>";
-                    echo "    <td>{$cal['calificacion']}</td>";
-                    echo "</tr>";
-                }
+    if ($selectedInstrumento) {
+        $calificaciones = getCalificacionesPorInstrumento($selectedInstrumento);
 
-                echo "</tbody></table>";
-            } else {
-                echo "<p class='text-center'>No hay calificaciones para este instrumento.</p>";
+        if (count($calificaciones) > 0) {
+            echo "<table border='1' cellpadding='8' cellspacing='0' style='width: 90%; margin: 0 auto; border-collapse: collapse;'>";
+            echo "<thead style='background-color: #333; color: #fff;'>";
+            echo "<tr>";
+            echo "    <th>Unidad</th>";
+            echo "    <th>Instrumento</th>";
+            echo "    <th>Usuario</th>";
+            echo "    <th>Calificación</th>";
+            echo "</tr>";
+            echo "</thead><tbody>";
+
+            foreach ($calificaciones as $cal) {
+                echo "<tr style='text-align: center;'>";
+                echo "    <td>{$cal['numUnidad']}</td>";
+                echo "    <td>" . htmlspecialchars($cal['nomInstrumento']) . "</td>";
+                echo "    <td>" . htmlspecialchars($cal['nomUsuario']) . "</td>";
+                echo "    <td>{$cal['calificacion']}</td>";
+                echo "</tr>";
             }
+
+            echo "</tbody></table>";
+        } else {
+            echo "<p style='text-align: center; color: gray;'>No hay calificaciones para este instrumento.</p>";
         }
+    }
     }
 } 
 
@@ -483,7 +499,56 @@ function getCalificacionesPorInstrumento($idInstrumento) {
     return $calificaciones;
 }
 
+function procesarCambiosInstrumentos() {
 
+    global $conn;
+
+    if(isset($_GET['operacion'])&&$_GET['operacion']=="eliminar"&&!$_POST['procesar']=="Guardar Cambios") {
+
+        $idInstrumento = $_GET['idAsignatura'];
+        $sql = "DELETE FROM notas.asignaturas where idAsignatura=$idAsig";
+        $conn->query($sql);
+        
+    }
+
+    if(isset($_POST['procesar'])&&$_POST['procesar']== "Guardar Cambios") {
+
+        if (isset($_POST['addAsig']) && $_POST['addAsig'] != "") {
+            $nuidAsignatura = $_POST["addAsig"];
+            $nunomAsignatura = $_POST["addNombre"];
+            $uhorasSemana = $_POST["addHoras"];
+            $nuidProfesor = $_POST["addProfesor"];
+
+            $sql = "INSERT INTO notas.asignaturas (idAsignatura, nomAsignatura, horasSemana, idProfesor) VALUES ('$nuidAsignatura', '$nunomAsignatura', '$uhorasSemana', '$nuidProfesor')";
+            $conn->query($sql);
+        }
+
+        $uidAsig = $_POST["idAsig"];
+        $uidAsignatura = $_POST["idAsignatura"];
+        $unomAsignatura = $_POST["nomAsignatura"];
+        $uhorasSemana = $_POST["horasSemana"];
+        $uidProf = $_POST["idProfesor"];
+
+        for($i=0; $i<count($_POST["idAsig"]); $i++) {
+
+            updateInstrumentos ($uidAsig[$i], $uidAsignatura[$i], $unomAsignatura[$i], $uhorasSemana[$i], $uidProf[$i]);
+        
+        }
+
+    }
+
+    $_POST = array();
+
+}
+
+function updateInstrumentos ($uidInst, $uidProf) {
+
+    global $conn;
+
+	$sql = "UPDATE notas.asignaturas SET idAsignatura='$uidAsignatura', nomAsignatura='$unomAsignatura', horasSemana='$uhorasSemana', idProfesor='$uidProf'  WHERE idAsignatura='$uidAsig'";
+	$conn->query( $sql );
+
+}
 
 
 // EXPEDIENTES

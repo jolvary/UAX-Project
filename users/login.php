@@ -12,7 +12,7 @@ var_dump("GET -> ", $_GET);
 
 
 session_start(); // For storing status messages
-/*
+
 $twilio = new Client($twilioAccountSid, $twilioAuthToken);
 
 $service = $twilio->verify->v2->services->create(
@@ -61,7 +61,7 @@ if (isset($_POST['sendSMS'])) {
         }
     }
 }
-*/
+
 if (isset($_POST['login'])) {
 
     $usuario = $_POST['usuario'];
@@ -71,8 +71,8 @@ if (isset($_POST['login'])) {
     $telefono = $_SESSION['telefono'];
 
     [$idUser, $rolUser] = iniSesion($usuario, $contraseña, 'login');
-    $_SESSION['idUsuario'] = $idUser = 32;
-    $_SESSION['rolUsuario'] = $rolUser = 'profesor';
+    $_SESSION['idUsuario'] = $idUser;
+    $_SESSION['rolUsuario'] = $rolUser;
 
     header("Location: ../sites/asignaturas.php");
 
@@ -80,7 +80,7 @@ if (isset($_POST['login'])) {
         "My First Verify Service"
     );
 
-/*
+
     if (!empty($codigo) && !empty($usuario) && !empty($sid)) {
         
         //var_dump(comprobarUsuario($usuario, $telefono)); // Debugging: check user existence
@@ -108,7 +108,7 @@ if (isset($_POST['login'])) {
 
                 if ($verificationCheck->status === "approved") {
 
-                    header("Location: https://jolvary.com/sites/asignaturas.php");
+                    header("Location: ./sites/asignaturas.php");
                     exit();
                     
                 } else {
@@ -135,7 +135,7 @@ if (isset($_POST['login'])) {
 
         alert("Por favor solicite e ingrese el código recibido por SMS.");
 
-    }*/
+    }
 }
 ?>
 
@@ -213,7 +213,7 @@ if (isset($_POST['login'])) {
                                 >
                                     Iniciar Sesión
                                 </button>
-                                <a href="https://jolvary.com/users/register.php" class="btn btn-secondary" >Registrarse</a>
+                                <a href="./users/register.php" class="btn btn-secondary" >Registrarse</a>
                             </div>
                         </form>
                     </div>
